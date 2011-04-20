@@ -2,6 +2,9 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  20 Apr 2011; Froxlor Release Team <release@froxlor.org> froxlor-9999.ebuild:
+  migrate to git-2
+
 *froxlor-0.9.19 (30 Mar 2011)
 
   30 Mar 2011; Froxlor Release Team <release@froxlor.org>

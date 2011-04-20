@@ -4,17 +4,19 @@
 
 EAPI="2"
 
-inherit eutils depend.php
+[[ ${PV} == 9999 ]] && SCM="git-2"
+EGIT_REPO_URI="git://git.froxlor.org/froxlor.git"
 
-if [[ ${PV} == "9999" ]] ; then
-	EGIT_REPO_URI="git://git.froxlor.org/froxlor.git"
-	EGIT_PROJECT="froxlor"
-	inherit git
-	#KEYWORDS=""
-else
+inherit eutils depend.php ${SCM}
+
+if [[ ${PV} != "9999" ]] ; then
 	RESTRICT="mirror"
 	SRC_URI="http://files.froxlor.org/releases/${P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
+else
+	SRC_URI=""
+	KEYWORDS=""
+
 fi
 
 DESCRIPTION="A PHP-based webhosting-oriented control panel for servers."
