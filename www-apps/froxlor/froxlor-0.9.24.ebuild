@@ -41,12 +41,6 @@ DEPEND="
 	)
 	awstats? (
 		www-misc/awstats
-		( !lighttpd? (
-			!nginx? (
-				www-misc/awstats[apache2]
-				)
-			)
-		)
 	)
 	!awstats? (
 		app-admin/webalizer
