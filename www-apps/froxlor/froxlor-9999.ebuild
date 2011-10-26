@@ -69,7 +69,7 @@ DEPEND="
 		)
 	)
 	fcgid? ( >=dev-lang/php-5.2[cgi]
-		|| ( <dev-lang/php-5.3[force-cgi-redirect] >=dev-lang/php-5.3 )
+		|| ( >=dev-lang/php-5.3 )
 		 sys-auth/libnss-mysql
 			( !lighttpd? (
 				!nginx? (
@@ -242,7 +242,7 @@ src_install() {
 
 		einfo "Checking for directory /etc/php/fpm-php5.3/fpm.d/"
 		if [ ! -d /etc/php/fpm-php5.3/fpm.d/ ]; then
-			didir "/etc/php/fpm-php5.3/fpm.d/"
+			dodir "/etc/php/fpm-php5.3/fpm.d/"
 		fi
 
 		einfo "Creating tmp-directory"
