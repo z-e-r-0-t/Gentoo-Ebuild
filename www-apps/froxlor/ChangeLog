@@ -4,8 +4,18 @@
 
 *froxlor-0.9.25 (14 Nov 2011)
 
-  14 Nov 2011;  <Dessa@gentoo.org> +froxlor-0.9.25.ebuild,
+  14 Nov 2011; Froxlor Release Team <release@froxlor.org> +froxlor-0.9.25.ebuild,
   -froxlor-0.9.24.ebuild:
+  version bump
+
+  26 Oct 2011; Froxlor Release Team <release@froxlor.org> froxlor-0.9.24.ebuild,
+  froxlor-9999.ebuild:
+  fix some QA crap
+
+*froxlor-0.9.24 (26 Oct 2011)
+
+  14 Nov 2011; Froxlor Release Team <release@froxlor.org> +froxlor-0.9.24.ebuild,
+  -froxlor-0.9.19.ebuild:
   version bump
 
   20 Apr 2011; Froxlor Release Team <release@froxlor.org> froxlor-9999.ebuild:
