@@ -102,7 +102,7 @@ S="${WORKDIR}/${PN}"
 
 src_unpack() {
 	if [[ ${PV} == "9999" ]] ; then
-		git_src_unpack
+		git-2_src_unpack
 	else
 		unpack ${A}
 	fi
