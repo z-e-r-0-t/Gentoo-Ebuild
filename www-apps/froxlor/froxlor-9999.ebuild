@@ -49,9 +49,7 @@ DEPEND="
 		domainkey? ( mail-filter/dkim-milter )
 	)
 	ssl? ( dev-libs/openssl )
-	lighttpd? ( www-servers/lighttpd[fastcgi,ssl=]
-		   >=dev-lang/php-5.2[cgi]
-	)
+	lighttpd? ( www-servers/lighttpd[php,ssl=] )
 	nginx? (
 		www-servers/nginx[ssl=]
 	)
