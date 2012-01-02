@@ -1,4 +1,4 @@
-# Copyright 1999-2011 Gentoo Foundation
+# Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -30,7 +30,7 @@ DEPEND="
 	>=mail-mta/postfix-2.4[mysql,ssl=]
 	virtual/cron
 	virtual/mysql
-	>=dev-lang/php-5.2[bcmath,cli,ctype,filter,ftp,gd,mysql,nls,posix,session,simplexml,ssl=,tokenizer,xml,xsl,zlib]
+	>=dev-lang/php-5.2[bcmath,cli,ctype,filter,ftp,gd,mysql,nls,pcntl,posix,session,simplexml,ssl=,tokenizer,xml,xsl,zlib]
 	|| ( <dev-lang/php-5.3[pcre] >=dev-lang/php-5.3 )
 	pureftpd? (
 		net-ftp/pure-ftpd[mysql,ssl=]
@@ -125,10 +125,6 @@ pkg_setup() {
 
 src_prepare() {
 	epatch_user
-	# Delete any mention of inserttask('4') if no Bind is used
-	if ! use bind ; then
-		find "${S}/" -type f -exec sed -e "s|inserttask('4');||g" -i {} \;
-	fi
 }
 
 src_install() {
@@ -218,8 +214,6 @@ src_install() {
 
 		einfo "Creating tmp-directory"
 		dodir "/var/customers/tmp"
-
-		ewarn "You have to remove the '-D PHP5' entry from /etc/conf.d/apache2 if it exists!"
 	fi
 
 	if use fpm ; then
@@ -241,10 +235,11 @@ src_install() {
 		dodir "/var/customers/tmp"
 	fi
 
-	# If Bind will not used, change the reload path for it
+	# If Bind will not used disable it and change the reload path for it
 	if ! use bind ; then
 		einfo "Switching 'bind' to 'Off'"
-		sed -e 's|/etc/init.d/named reload|/bin/true|g' -i "${S}/install/froxlor.sql" || die "Unable to change reload path for Bind"
+		sed -e 's|'bind_enable', '1'|'bind_enable', '0'|g' -i "${S}/install/froxlor.sql" || die "Unable to change reload path for Bind"
+    sed -e 's|/etc/init.d/named reload|/bin/true|g' -i "${S}/install/froxlor.sql" || die "Unable to change reload path for Bind"
 	fi
 
 	# default value is logging_enabled='1'
@@ -906,15 +901,20 @@ php_admin_value[sendmail_path] = /usr/sbin/sendmail -t -i -f admin@${servername}
 		if use fcgid ; then
 			# create php-starter file
 			FCGIDPATH="${ROOT}${FROXLOR_DOCROOT}/php-fcgi-scripts/froxlor.panel/${servername}"
+			chmod 0750 "${FCGIDPATH}"
+			chown froxlor:froxlor "${FCGIDPATH}"
 			mkdir -p "${FCGIDPATH}/php-fcgi-script"
+			chown froxlor:froxlor "${FCGIDPATH}/php-fcgi-script" || die "Unable to fix owner for php-fcgi-script folder"
 			mkdir -p "${FCGIDPATH}/tmp"
 			chmod 0750 "${FCGIDPATH}/tmp"
+			chown froxlor:froxlor "${FCGIDPATH}/tmp"
 			touch "${FCGIDPATH}/php-fcgi-starter"
 			cp "${ROOT}/usr/share/${PN}/php-fcgi-starter" "${FCGIDPATH}/php-fcgi-starter"
 			chmod 0750 "${FCGIDPATH}/php-fcgi-starter"
 			touch "${FCGIDPATH}/php.ini"
 			cp "${ROOT}/usr/share/${PN}/php.ini" "${FCGIDPATH}/php.ini"
-			chown froxlor:froxlor -R "${FCGIDPATH}/php-fcgi-script" || die "Unable to fix owner for php-fcgi-script folder"
+			chmod 0750 "${FCGIDPATH}/php.ini"
+			chown froxlor:froxlor "${FCGIDPATH}/php.ini"
 			chattr +i "${FCGIDPATH}/php-fcgi-starter"
 		fi
 
