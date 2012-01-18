@@ -239,7 +239,7 @@ src_install() {
 	if ! use bind ; then
 		einfo "Switching 'bind' to 'Off'"
 		sed -e 's|'bind_enable', '1'|'bind_enable', '0'|g' -i "${S}/install/froxlor.sql" || die "Unable to change reload path for Bind"
-    sed -e 's|/etc/init.d/named reload|/bin/true|g' -i "${S}/install/froxlor.sql" || die "Unable to change reload path for Bind"
+		sed -e 's|/etc/init.d/named reload|/bin/true|g' -i "${S}/install/froxlor.sql" || die "Unable to change reload path for Bind"
 	fi
 
 	# default value is logging_enabled='1'
