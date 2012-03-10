@@ -5,9 +5,10 @@
 EAPI="2"
 
 [[ ${PV} == 9999 ]] && SCM="git-2"
-EGIT_REPO_URI="git://git.froxlor.org/froxlor.git"
+EGIT_REPO_URI="https://github.com/Froxlor/Froxlor.git"
+EGIT_PROJECT="froxlor"
 
-inherit eutils depend.php ${SCM}
+inherit eutils ${SCM}
 
 if [[ ${PV} != "9999" ]] ; then
 	RESTRICT="mirror"
@@ -30,7 +31,7 @@ DEPEND="
 	>=mail-mta/postfix-2.4[mysql,ssl=]
 	virtual/cron
 	virtual/mysql
-	dev-lang/php[bcmath,cli,ctype,filter,ftp,gd,mysql,nls,pcre,pcntl,posix,session,simplexml,ssl=,tokenizer,xml,xsl,zlib]
+	>=dev-lang/php-5.2[bcmath,cli,ctype,filter,ftp,gd,mysql,nls,pcntl,posix,session,simplexml,ssl=,tokenizer,xml,xsl,zlib]
 	pureftpd? (
 		net-ftp/pure-ftpd[mysql,ssl=]
 	)
@@ -91,9 +92,6 @@ done
 
 # lets check user defined variables
 FROXLOR_DOCROOT="${FROXLOR_DOCROOT:-/var/www}"
-
-need_php5_httpd
-need_php5_cli
 
 S="${WORKDIR}/${PN}"
 
