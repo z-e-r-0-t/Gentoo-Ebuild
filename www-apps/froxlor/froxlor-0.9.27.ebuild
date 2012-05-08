@@ -5,9 +5,10 @@
 EAPI="2"
 
 [[ ${PV} == 9999 ]] && SCM="git-2"
-EGIT_REPO_URI="git://git.froxlor.org/froxlor.git"
+EGIT_REPO_URI="https://github.com/Froxlor/Froxlor.git"
+EGIT_PROJECT="froxlor"
 
-inherit eutils depend.php ${SCM}
+inherit eutils ${SCM}
 
 if [[ ${PV} != "9999" ]] ; then
 	RESTRICT="mirror"
@@ -23,7 +24,7 @@ DESCRIPTION="A PHP-based webhosting-oriented control panel for servers."
 HOMEPAGE="http://www.froxlor.org/"
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="aps autoresponder awstats bind domainkey dovecot fcgid ftpquota fpm lighttpd +log mailquota nginx pureftpd ssl +tickets"
+IUSE="aps autoresponder awstats bind domainkey dovecot fcgid ftpquota fpm lighttpd +log mailquota nginx pureftpd quota ssl +tickets"
 
 DEPEND="
 	!www-apps/syscp
@@ -31,7 +32,6 @@ DEPEND="
 	virtual/cron
 	virtual/mysql
 	>=dev-lang/php-5.2[bcmath,cli,ctype,filter,ftp,gd,mysql,nls,pcntl,posix,session,simplexml,ssl=,tokenizer,xml,xsl,zlib]
-	|| ( <dev-lang/php-5.3[pcre] >=dev-lang/php-5.3 )
 	pureftpd? (
 		net-ftp/pure-ftpd[mysql,ssl=]
 	)
@@ -60,8 +60,7 @@ DEPEND="
 			)
 		)
 	)
-	fcgid? ( >=dev-lang/php-5.2[cgi]
-		|| ( >=dev-lang/php-5.3 )
+	fcgid? ( dev-lang/php[cgi]
 		 sys-auth/libnss-mysql
 			( !lighttpd? (
 				!nginx? (
@@ -80,7 +79,8 @@ DEPEND="
 		    >=mail-mta/postfix-2.4[sasl]
 	)
 	aps? ( dev-lang/php[zip] )
-	mailquota? ( >=mail-mta/postfix-2.4[vda] )"
+	mailquota? ( >=mail-mta/postfix-2.4[vda] )
+	quota? ( sys-fs/quotatool )"
 
 RDEPEND="${DEPEND}"
 
@@ -92,9 +92,6 @@ done
 
 # lets check user defined variables
 FROXLOR_DOCROOT="${FROXLOR_DOCROOT:-/var/www}"
-
-need_php5_httpd
-need_php5_cli
 
 S="${WORKDIR}/${PN}"
 
