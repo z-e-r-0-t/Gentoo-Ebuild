@@ -26,7 +26,7 @@ LICENSE="GPL-2"
 SLOT="0"
 IUSE="aps autoresponder awstats bind domainkey dovecot fcgid ftpquota fpm lighttpd +log mailquota nginx pureftpd quota ssl +tickets"
 
-PHP_REQUIRED_FLAGS="bcmath,cli,ctype,filter,ftp,gd,mysql,nls,pcntl,posix,session,simplexml,ssl=,tokenizer,xml,xsl,zlib"
+PHP_REQUIRED_FLAGS="bcmath,cli,ctype,filter,ftp,gd,mysql,nls,pcntl,posix,session,simplexml,ssl=,tokenizer,xml,xsl(+),xslt(+),zlib"
 
 DEPEND="
 	!www-apps/syscp
