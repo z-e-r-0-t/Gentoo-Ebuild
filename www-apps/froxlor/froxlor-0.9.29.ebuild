@@ -4,24 +4,22 @@
 
 EAPI="5"
 
-[[ ${PV} == 9999 ]] && SCM="git-2"
-EGIT_REPO_URI="https://github.com/Froxlor/Froxlor.git"
-EGIT_PROJECT="froxlor"
+inherit eutils
 
-inherit eutils ${SCM}
-
-if [[ ${PV} != "9999" ]] ; then
+if [[ ${PV} = "9999" ]] ; then
+	EGIT_REPO_URI="https://github.com/Froxlor/Froxlor.git"
+	EGIT_PROJECT="froxlor"
+	inherit git-r3
+	KEYWORDS=""
+else
 	RESTRICT="mirror"
 	SRC_URI="http://files.froxlor.org/releases/${P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
-else
-	SRC_URI=""
-	KEYWORDS=""
-
 fi
 
 DESCRIPTION="A PHP-based webhosting-oriented control panel for servers."
 HOMEPAGE="http://www.froxlor.org/"
+
 LICENSE="GPL-2"
 SLOT="0"
 IUSE="aps autoresponder awstats bind domainkey dovecot fcgid ftpquota fpm lighttpd +log mailquota nginx pureftpd quota ssl +tickets"
