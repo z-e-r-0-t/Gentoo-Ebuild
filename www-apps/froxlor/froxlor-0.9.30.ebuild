@@ -8,7 +8,7 @@ inherit eutils
 
 if [[ ${PV} = "9999" ]] ; then
 	EGIT_REPO_URI="https://github.com/Froxlor/Froxlor.git"
-	EGIT_PROJECT="froxlor"
+	EGIT_CHECKOUT_DIR=${WORKDIR}/${PN}
 	inherit git-r3
 	KEYWORDS=""
 else
@@ -102,11 +102,10 @@ S="${WORKDIR}/${PN}"
 
 src_unpack() {
 	if [[ ${PV} == "9999" ]] ; then
-		git-2_src_unpack
+		git-r3_src_unpack
 	else
 		unpack ${A}
 	fi
-	cd "${S}"
 }
 
 src_prepare() {
