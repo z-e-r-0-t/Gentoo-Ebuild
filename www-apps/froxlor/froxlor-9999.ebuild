@@ -167,6 +167,7 @@ src_install() {
 		sed -e "s|'apacheconf_htpasswddir', '/etc/apache/htpasswd/'|'apacheconf_htpasswddir', '/etc/lighttpd/htpasswd/'|g" -i "${S}/install/froxlor.sql" || die "Unable to change webserver htpasswd directory"
 		sed -e "s|'httpuser', 'www-data'|'httpuser', 'lighttpd'|g" -i "${S}/install/froxlor.sql" || die "Unable to change webserver user"
 		sed -e "s|'httpgroup', 'www-data'|'httpgroup', 'lighttpd'|g" -i "${S}/install/froxlor.sql" || die "Unable to change webserver group"
+		sed -e "s|'fastcgi_ipcdir', '/var/lib/apache2/fastcgi/'|'fastcgi_ipcdir', '/var/run/lighttpd/'|g" -i "${S}/install/froxlor.sql" || die "Unable to change php-ipc directory"
 	elif use nginx; then
 		einfo "Switching settings to fit 'nginx'"
 		sed -e "s|/etc/init.d/apache reload|/etc/init.d/nginx restart|g" -i "${S}/install/froxlor.sql" || die "Unable to change webserver restart-command"
@@ -176,6 +177,7 @@ src_install() {
 		sed -e "s|'apacheconf_htpasswddir', '/etc/apache/htpasswd/'|'apacheconf_htpasswddir', '/etc/nginx/htpasswd/'|g" -i "${S}/install/froxlor.sql" || die "Unable to change webserver htpasswd directory"
 		sed -e "s|'httpuser', 'www-data'|'httpuser', 'nginx'|g" -i "${S}/install/froxlor.sql" || die "Unable to change webserver user"
 		sed -e "s|'httpgroup', 'www-data'|'httpgroup', 'nginx'|g" -i "${S}/install/froxlor.sql" || die "Unable to change webserver group"
+                sed -e "s|'fastcgi_ipcdir', '/var/lib/apache2/fastcgi/'|'fastcgi_ipcdir', '/var/run/nginx/'|g" -i "${S}/install/froxlor.sql" || die "Unable to change php-ipc directory"
 	else
 		einfo "Switching settings to fit 'apache2'"
 		sed -e "s|/etc/init.d/apache reload|/etc/init.d/apache2 reload|g" -i "${S}/install/froxlor.sql" || die "Unable to change webserver restart-command"
