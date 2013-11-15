@@ -24,14 +24,14 @@ LICENSE="GPL-2"
 SLOT="0"
 IUSE="aps autoresponder awstats bind domainkey dovecot fcgid ftpquota fpm lighttpd +log mailquota nginx pureftpd quota ssl +tickets"
 
-PHP_REQUIRED_FLAGS="bcmath,cli,ctype,filter,ftp,gd,mysql,nls,pcntl,posix,session,simplexml,ssl=,tokenizer,xml,xsl(+),xslt(+),zlib"
+PHP_REQUIRED_FLAGS="bcmath,cli,ctype,filter,ftp,gd,mysql,nls,pcntl,pdo,posix,session,simplexml,ssl=,tokenizer,xml,xslt,zlib"
 
 DEPEND="
 	!www-apps/syscp
 	>=mail-mta/postfix-2.4[mysql,ssl=]
 	virtual/cron
 	virtual/mysql
-	>=dev-lang/php-5.2[${PHP_REQUIRED_FLAGS}]
+	>=dev-lang/php-5.3[${PHP_REQUIRED_FLAGS}]
 	pureftpd? (
 		net-ftp/pure-ftpd[mysql,ssl=]
 	)
