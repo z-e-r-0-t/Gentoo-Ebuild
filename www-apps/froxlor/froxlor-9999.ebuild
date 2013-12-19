@@ -8,7 +8,6 @@ inherit eutils
 
 if [[ ${PV} = "9999" ]] ; then
 	EGIT_REPO_URI="https://github.com/Froxlor/Froxlor.git"
-	EGIT_BRANCH="0.9.31"
 	EGIT_CHECKOUT_DIR=${WORKDIR}/${PN}
 	inherit git-r3
 	KEYWORDS=""
