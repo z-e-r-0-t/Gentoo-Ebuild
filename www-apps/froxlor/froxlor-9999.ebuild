@@ -22,7 +22,7 @@ HOMEPAGE="http://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="aps autoresponder awstats bind domainkey dovecot fcgid ftpquota fpm lighttpd +log mailquota nginx pureftpd quota ssl +tickets"
+IUSE="awstats bind domainkey dovecot fcgid ftpquota fpm lighttpd +log mailquota nginx pureftpd quota ssl +tickets"
 
 PHP_REQUIRED_FLAGS="bcmath,cli,ctype,filter,ftp,gd,mysql,nls,pcntl,pdo,posix,session,simplexml,ssl=,tokenizer,xml,xslt,zlib"
 
@@ -81,7 +81,6 @@ DEPEND="
 		    net-mail/courier-imap
 		    >=mail-mta/postfix-2.4[sasl]
 	)
-	aps? ( dev-lang/php[zip] )
 	mailquota? ( >=mail-mta/postfix-2.4[vda] )
 	quota? ( sys-fs/quotatool )"
 
@@ -236,12 +235,6 @@ src_install() {
 		sed -e "s|'mail_quota_enabled', '0'|'mail_quota_enabled', '1'|g" -i "${S}/install/froxlor.sql" || die "Unable to set mailquota to 'On'"
 	fi
 
-	# default value is autoresponder='0'
-	if use autoresponder ; then
-		einfo "Switching 'autoresponder' to 'On'"
-		sed -e "s|'autoresponder_active', '0'|'autoresponder_active', '1'|g" -i "${S}/install/froxlor.sql" || die "Unable to set autoresponder to 'On'"
-	fi
-
 	# default value is dkim_enabled='0'
 	if use domainkey && use bind ; then
 		einfo "Switching 'domainkey' to 'On'"
@@ -249,18 +242,6 @@ src_install() {
 
 		einfo "Setting dkim-path to gentoo value"
 		sed -e "s|'dkim_prefix', '/etc/postfix/dkim/'|'dkim_prefix', '/etc/mail/dkim-filter/'|g" -i "${S}/install/froxlor.sql" || die "Unable to set domainkey prefix"
-	fi
-
-	# default value is aps_enabled='0'
-	if use aps ; then
-		einfo "Switching 'APS' to 'On'"
-		sed -e "s|'aps_active', '0'|'aps_active', '1'|g" -i "${S}/install/froxlor.sql" || die "Unable to set aps to 'On'"
-
-		# if aps is used we enable required features in the php-cli php.ini
-		ewarn
-		ewarn "Note: APS requires the php setting 'allow_url_fopen' to be enabled"
-		ewarn "      for the Froxlor vhost. Please adjust the corresponding php.ini"
-		ewarn
 	fi
 
 	# default value is ssl_enabled='1'
