@@ -1,4 +1,4 @@
-# Copyright 1999-2013 Gentoo Foundation
+# Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -73,7 +73,7 @@ DEPEND="
 	fpm? ( dev-lang/php[fpm]
 		sys-auth/libnss-mysql
 	)
-	dovecot? ( >=net-mail/dovecot-1.2.0[mysql,ssl=]
+	dovecot? ( >=net-mail/dovecot-2.2.0[mysql,ssl=]
 		   >=mail-mta/postfix-2.4[dovecot-sasl]
 	)
 	!dovecot? ( dev-libs/cyrus-sasl[crypt,mysql,ssl=]
@@ -265,8 +265,6 @@ src_install() {
 	einfo "Installing Froxlor files"
 	dodir ${FROXLOR_DOCROOT}
 	cp -Rf "${S}/" "${D}${FROXLOR_DOCROOT}/" || die "Installation of the Froxlor files failed"
-
-	fperms 0775 ${FROXLOR_DOCROOT}/froxlor/{temp,packages}
 }
 
 pkg_postinst() {
