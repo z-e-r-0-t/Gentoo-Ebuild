@@ -89,7 +89,7 @@ RDEPEND="${DEPEND}"
 REQUIRED_USE="lighttpd? ( !nginx ) fcgid? ( !fpm )"
 
 # we need that to set the standardlanguage later
-LANGS="bg ca cs de da en es fr hu it nl pl pt ru se sl zh_CN"
+LANGS="de en fr it nl pt se"
 for X in ${LANGS} ; do
 	IUSE="${IUSE} linguas_${X}"
 done
@@ -114,38 +114,18 @@ src_prepare() {
 src_install() {
 	# set default language
 	local MYLANG=""
-	if use linguas_bg ; then
-		MYLANG="Bulgarian"
-	elif use linguas_ca ; then
-		MYLANG="Catalan"
-	elif use linguas_cs ; then
-		MYLANG="Czech"
 	elif use linguas_de ; then
 		MYLANG="Deutsch"
-	elif use linguas_da ; then
-		MYLANG="Danish"
-	elif use linguas_es ; then
-		MYLANG="Espa&ntilde;ol"
 	elif use linguas_fr ; then
 		MYLANG="Fran&ccedil;ais"
-	elif use linguas_hu ; then
-		MYLANG="Hungarian"
 	elif use linguas_it ; then
 		MYLANG="Italian"
 	elif use linguas_nl ; then
 		MYLANG="Dutch"
-	elif use linguas_pl ; then
-		MYLANG="Polski"
 	elif use linguas_pt ; then
 		MYLANG="Portugu&ecirc;s"
-	elif use linguas_ru ; then
-		MYLANG="Russian"
 	elif use linguas_se ; then
 		MYLANG="Swedish"
-	elif use linguas_sl ; then
-		MYLANG="Slovak"
-	elif use linguas_zh_CN ; then
-		MYLANG="Chinese"
 	fi
 
 	if [[ ${MYLANG} != '' ]] ; then
@@ -176,7 +156,7 @@ src_install() {
 		sed -e "s|'apacheconf_htpasswddir', '/etc/apache2/htpasswd/'|'apacheconf_htpasswddir', '/etc/nginx/htpasswd/'|g" -i "${S}/install/froxlor.sql" || die "Unable to change webserver htpasswd directory"
 		sed -e "s|'httpuser', 'www-data'|'httpuser', 'nginx'|g" -i "${S}/install/froxlor.sql" || die "Unable to change webserver user"
 		sed -e "s|'httpgroup', 'www-data'|'httpgroup', 'nginx'|g" -i "${S}/install/froxlor.sql" || die "Unable to change webserver group"
-                sed -e "s|'fastcgi_ipcdir', '/var/lib/apache2/fastcgi/'|'fastcgi_ipcdir', '/var/run/nginx/'|g" -i "${S}/install/froxlor.sql" || die "Unable to change php-ipc directory"
+		sed -e "s|'fastcgi_ipcdir', '/var/lib/apache2/fastcgi/'|'fastcgi_ipcdir', '/var/run/nginx/'|g" -i "${S}/install/froxlor.sql" || die "Unable to change php-ipc directory"
 	else
 		einfo "Switching settings to fit 'apache2'"
 		sed -e "s|'apacheconf_vhost', '/etc/apache2/vhosts.conf'|'apacheconf_vhost', '/etc/apache2/vhosts.d/'|g" -i "${S}/install/froxlor.sql" || die "Unable to change webserver vhost directory"

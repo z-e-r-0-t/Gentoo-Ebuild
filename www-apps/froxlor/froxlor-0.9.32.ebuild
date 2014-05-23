@@ -1,4 +1,4 @@
-# Copyright 1999-2013 Gentoo Foundation
+# Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
@@ -22,7 +22,7 @@ HOMEPAGE="http://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="aps autoresponder awstats bind domainkey dovecot fcgid ftpquota fpm lighttpd +log mailquota nginx pureftpd quota ssl +tickets"
+IUSE="awstats bind domainkey dovecot fcgid ftpquota fpm lighttpd +log mailquota nginx pureftpd quota ssl +tickets"
 
 PHP_REQUIRED_FLAGS="bcmath,cli,ctype,filter,ftp,gd,mysql,nls,pcntl,pdo,posix,session,simplexml,ssl=,tokenizer,xml,xslt,zlib"
 
@@ -73,7 +73,7 @@ DEPEND="
 	fpm? ( dev-lang/php[fpm]
 		sys-auth/libnss-mysql
 	)
-	dovecot? ( >=net-mail/dovecot-1.2.0[mysql,ssl=]
+	dovecot? ( >=net-mail/dovecot-2.2.0[mysql,ssl=]
 		   >=mail-mta/postfix-2.4[dovecot-sasl]
 	)
 	!dovecot? ( dev-libs/cyrus-sasl[crypt,mysql,ssl=]
@@ -81,7 +81,6 @@ DEPEND="
 		    net-mail/courier-imap
 		    >=mail-mta/postfix-2.4[sasl]
 	)
-	aps? ( dev-lang/php[zip] )
 	mailquota? ( >=mail-mta/postfix-2.4[vda] )
 	quota? ( sys-fs/quotatool )"
 
@@ -90,7 +89,7 @@ RDEPEND="${DEPEND}"
 REQUIRED_USE="lighttpd? ( !nginx ) fcgid? ( !fpm )"
 
 # we need that to set the standardlanguage later
-LANGS="bg ca cs de da en es fr hu it nl pl pt ru se sl zh_CN"
+LANGS="de en fr it nl pt se"
 for X in ${LANGS} ; do
 	IUSE="${IUSE} linguas_${X}"
 done
@@ -115,38 +114,18 @@ src_prepare() {
 src_install() {
 	# set default language
 	local MYLANG=""
-	if use linguas_bg ; then
-		MYLANG="Bulgarian"
-	elif use linguas_ca ; then
-		MYLANG="Catalan"
-	elif use linguas_cs ; then
-		MYLANG="Czech"
 	elif use linguas_de ; then
 		MYLANG="Deutsch"
-	elif use linguas_da ; then
-		MYLANG="Danish"
-	elif use linguas_es ; then
-		MYLANG="Espa&ntilde;ol"
 	elif use linguas_fr ; then
 		MYLANG="Fran&ccedil;ais"
-	elif use linguas_hu ; then
-		MYLANG="Hungarian"
 	elif use linguas_it ; then
 		MYLANG="Italian"
 	elif use linguas_nl ; then
 		MYLANG="Dutch"
-	elif use linguas_pl ; then
-		MYLANG="Polski"
 	elif use linguas_pt ; then
 		MYLANG="Portugu&ecirc;s"
-	elif use linguas_ru ; then
-		MYLANG="Russian"
 	elif use linguas_se ; then
 		MYLANG="Swedish"
-	elif use linguas_sl ; then
-		MYLANG="Slovak"
-	elif use linguas_zh_CN ; then
-		MYLANG="Chinese"
 	fi
 
 	if [[ ${MYLANG} != '' ]] ; then
@@ -177,7 +156,7 @@ src_install() {
 		sed -e "s|'apacheconf_htpasswddir', '/etc/apache2/htpasswd/'|'apacheconf_htpasswddir', '/etc/nginx/htpasswd/'|g" -i "${S}/install/froxlor.sql" || die "Unable to change webserver htpasswd directory"
 		sed -e "s|'httpuser', 'www-data'|'httpuser', 'nginx'|g" -i "${S}/install/froxlor.sql" || die "Unable to change webserver user"
 		sed -e "s|'httpgroup', 'www-data'|'httpgroup', 'nginx'|g" -i "${S}/install/froxlor.sql" || die "Unable to change webserver group"
-                sed -e "s|'fastcgi_ipcdir', '/var/lib/apache2/fastcgi/'|'fastcgi_ipcdir', '/var/run/nginx/'|g" -i "${S}/install/froxlor.sql" || die "Unable to change php-ipc directory"
+		sed -e "s|'fastcgi_ipcdir', '/var/lib/apache2/fastcgi/'|'fastcgi_ipcdir', '/var/run/nginx/'|g" -i "${S}/install/froxlor.sql" || die "Unable to change php-ipc directory"
 	else
 		einfo "Switching settings to fit 'apache2'"
 		sed -e "s|'apacheconf_vhost', '/etc/apache2/vhosts.conf'|'apacheconf_vhost', '/etc/apache2/vhosts.d/'|g" -i "${S}/install/froxlor.sql" || die "Unable to change webserver vhost directory"
@@ -236,12 +215,6 @@ src_install() {
 		sed -e "s|'mail_quota_enabled', '0'|'mail_quota_enabled', '1'|g" -i "${S}/install/froxlor.sql" || die "Unable to set mailquota to 'On'"
 	fi
 
-	# default value is autoresponder='0'
-	if use autoresponder ; then
-		einfo "Switching 'autoresponder' to 'On'"
-		sed -e "s|'autoresponder_active', '0'|'autoresponder_active', '1'|g" -i "${S}/install/froxlor.sql" || die "Unable to set autoresponder to 'On'"
-	fi
-
 	# default value is dkim_enabled='0'
 	if use domainkey && use bind ; then
 		einfo "Switching 'domainkey' to 'On'"
@@ -249,18 +222,6 @@ src_install() {
 
 		einfo "Setting dkim-path to gentoo value"
 		sed -e "s|'dkim_prefix', '/etc/postfix/dkim/'|'dkim_prefix', '/etc/mail/dkim-filter/'|g" -i "${S}/install/froxlor.sql" || die "Unable to set domainkey prefix"
-	fi
-
-	# default value is aps_enabled='0'
-	if use aps ; then
-		einfo "Switching 'APS' to 'On'"
-		sed -e "s|'aps_active', '0'|'aps_active', '1'|g" -i "${S}/install/froxlor.sql" || die "Unable to set aps to 'On'"
-
-		# if aps is used we enable required features in the php-cli php.ini
-		ewarn
-		ewarn "Note: APS requires the php setting 'allow_url_fopen' to be enabled"
-		ewarn "      for the Froxlor vhost. Please adjust the corresponding php.ini"
-		ewarn
 	fi
 
 	# default value is ssl_enabled='1'
@@ -284,8 +245,6 @@ src_install() {
 	einfo "Installing Froxlor files"
 	dodir ${FROXLOR_DOCROOT}
 	cp -Rf "${S}/" "${D}${FROXLOR_DOCROOT}/" || die "Installation of the Froxlor files failed"
-
-	fperms 0775 ${FROXLOR_DOCROOT}/froxlor/{temp,packages}
 }
 
 pkg_postinst() {
