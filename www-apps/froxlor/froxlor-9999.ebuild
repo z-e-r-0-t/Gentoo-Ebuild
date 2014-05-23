@@ -114,7 +114,7 @@ src_prepare() {
 src_install() {
 	# set default language
 	local MYLANG=""
-	elif use linguas_de ; then
+	if use linguas_de ; then
 		MYLANG="Deutsch"
 	elif use linguas_fr ; then
 		MYLANG="Fran&ccedil;ais"
