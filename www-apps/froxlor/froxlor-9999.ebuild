@@ -55,8 +55,10 @@ DEPEND="
 	)
 	!lighttpd? (
 		( !nginx? (
-			www-servers/apache[ssl=]
-			dev-lang/php[apache2]
+			!fpm? (
+				www-servers/apache[ssl=]
+				dev-lang/php[apache2]
+				)
 			)
 		)
 	)
