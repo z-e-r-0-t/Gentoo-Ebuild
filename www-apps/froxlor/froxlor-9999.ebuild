@@ -22,7 +22,7 @@ HOMEPAGE="http://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="awstats bind domainkey dovecot fcgid ftpquota fpm lighttpd +log mailquota nginx pureftpd quota ssl +tickets"
+IUSE="awstats bind domainkey +dovecot fcgid ftpquota fpm lighttpd +log mailquota nginx pureftpd quota ssl +tickets vsftpd"
 
 PHP_REQUIRED_FLAGS="bcmath,cli,ctype,filter,ftp,gd,mysql,nls,pcntl,pdo,posix,session,simplexml,ssl=,tokenizer,unicode,xml,xslt,zlib"
 
@@ -35,9 +35,16 @@ DEPEND="
 	pureftpd? (
 		net-ftp/pure-ftpd[mysql,ssl=]
 	)
+	vsftpd? (
+		net-ftp/vsftpd[pam,ssl=]
+		sys-auth/pam_mysql
+	)
 	!pureftpd? (
-		net-ftp/proftpd[mysql,ssl=]
-		ftpquota? ( net-ftp/proftpd[softquota] )
+		( !vsftpd? (
+			net-ftp/proftpd[mysql,ssl=]
+			ftpquota? ( net-ftp/proftpd[softquota] )
+			)
+		)
 	)
 	awstats? (
 		www-misc/awstats
@@ -55,8 +62,8 @@ DEPEND="
 	)
 	!lighttpd? (
 		( !nginx? (
+			www-servers/apache[ssl=]
 			!fpm? (
-				www-servers/apache[ssl=]
 				dev-lang/php[apache2]
 				)
 			)
@@ -78,7 +85,7 @@ DEPEND="
 	dovecot? ( >=net-mail/dovecot-2.2.0[mysql,ssl=]
 		   >=mail-mta/postfix-2.4[dovecot-sasl]
 	)
-	!dovecot? ( dev-libs/cyrus-sasl[crypt,mysql,ssl=]
+	!dovecot? ( dev-libs/cyrus-sasl[mysql,ssl=]
 		    net-libs/courier-authlib[crypt,mysql]
 		    net-mail/courier-imap
 		    >=mail-mta/postfix-2.4[sasl]
@@ -88,7 +95,7 @@ DEPEND="
 
 RDEPEND="${DEPEND}"
 
-REQUIRED_USE="lighttpd? ( !nginx ) fcgid? ( !fpm )"
+REQUIRED_USE="lighttpd? ( !nginx ) fcgid? ( !fpm ) vsftpd? ( !ftpquota )"
 
 # we need that to set the standardlanguage later
 LANGS="de en fr it nl pt se"
