@@ -102,9 +102,9 @@ RDEPEND="${DEPEND}"
 REQUIRED_USE="lighttpd? ( !nginx ) fcgid? ( !fpm ) vsftpd? ( !ftpquota ) pdns? ( !bind )"
 
 # we need that to set the standardlanguage later
-LANGS="de en fr it nl pt se"
+LANGS="de en fr it nl pt sv"
 for X in ${LANGS} ; do
-	IUSE="${IUSE} linguas_${X}"
+	IUSE="${IUSE} l10n_${X}"
 done
 
 # lets check user defined variables
@@ -127,17 +127,17 @@ src_prepare() {
 src_install() {
 	# set default language
 	local MYLANG=""
-	if use linguas_de ; then
+	if use l10n_de ; then
 		MYLANG="Deutsch"
-	elif use linguas_fr ; then
+	elif use l10n_fr ; then
 		MYLANG="Fran&ccedil;ais"
-	elif use linguas_it ; then
+	elif use l10n_it ; then
 		MYLANG="Italian"
-	elif use linguas_nl ; then
+	elif use l10n_nl ; then
 		MYLANG="Dutch"
-	elif use linguas_pt ; then
+	elif use l10n_pt ; then
 		MYLANG="Portugu&ecirc;s"
-	elif use linguas_se ; then
+	elif use l10n_sv ; then
 		MYLANG="Swedish"
 	fi
 
@@ -274,7 +274,7 @@ src_install() {
 	# Install the Froxlor files
 	einfo "Installing Froxlor files"
 	dodir ${FROXLOR_DOCROOT}
-	cp -Rf "${S}/" "${D}${FROXLOR_DOCROOT}/" || die "Installation of the Froxlor files failed"
+	cp -R "${S}/" "${D}${FROXLOR_DOCROOT}/" || die "Installation of the Froxlor files failed"
 }
 
 pkg_postinst() {
@@ -292,7 +292,7 @@ pkg_postinst() {
 		elog "to /etc/cron.d/froxlor and remove /etc/cron.d/syscp"
 	else
 		elog "Please open http://[ip]/froxlor in your browser to continue"
-		elog "continue with the basic setup of Froxlor."
+		elog "with the basic setup of Froxlor."
 		elog
 		elog "Don't forget to setup your MySQL databases root user and password"
 		elog "using emerge --config mysql"
