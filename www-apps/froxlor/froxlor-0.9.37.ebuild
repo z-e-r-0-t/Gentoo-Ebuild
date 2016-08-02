@@ -22,7 +22,7 @@ HOMEPAGE="http://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="awstats bind domainkey +dovecot fcgid ftpquota fpm libressl lighttpd +log mailquota nginx pureftpd quota ssl +tickets vsftpd"
+IUSE="awstats bind domainkey +dovecot fcgid ftpquota fpm libressl lighttpd +log mailquota nginx pdns pureftpd quota ssl +tickets vsftpd"
 
 DEPEND="
 	!www-apps/syscp
@@ -50,8 +50,11 @@ DEPEND="
 	!awstats? (
 		app-admin/webalizer
 	)
-	bind? ( net-dns/bind
-		domainkey? ( mail-filter/opendkim )
+	bind? ( net-dns/bind[ssl=]
+		domainkey? ( mail-filter/opendkim[ssl=,libressl=] )
+	)
+	pdns? ( net-dns/pdns[mysql]
+		domainkey? ( mail-filter/opendkim[ssl=,libressl=] )
 	)
 	ssl? (
 		!libressl? ( >=dev-libs/openssl-1.0.2:* )
@@ -96,7 +99,7 @@ DEPEND="
 
 RDEPEND="${DEPEND}"
 
-REQUIRED_USE="lighttpd? ( !nginx ) fcgid? ( !fpm ) vsftpd? ( !ftpquota )"
+REQUIRED_USE="lighttpd? ( !nginx ) fcgid? ( !fpm ) vsftpd? ( !ftpquota ) pdns? ( !bind )"
 
 # we need that to set the standardlanguage later
 LANGS="de en fr it nl pt sv"
@@ -200,11 +203,28 @@ src_install() {
 
 	fi
 
-	# If Bind will not used disable it and change the reload path for it
-	if ! use bind ; then
-		einfo "Switching 'bind' to 'Off'"
-		sed -e 's|'bind_enable', '1'|'bind_enable', '0'|g' -i "${S}/install/froxlor.sql" || die "Unable to change reload path for Bind"
-		sed -e 's|/etc/init.d/named reload|/bin/true|g' -i "${S}/install/froxlor.sql" || die "Unable to change reload path for Bind"
+	# If Bind and pdns will not be used disable nameserver
+	if ! use bind && ! use pdns; then
+		einfo "Disabling nameserver"
+		sed -e 's|'bind_enable', '1'|'bind_enable', '0'|g' -i "${S}/install/froxlor.sql" || die "Unable to change binds enabled flag"
+		sed -e 's|/etc/init.d/bind9 reload|/bin/true|g' -i "${S}/install/froxlor.sql" || die "Unable to change reload path for Bind"
+	fi
+
+	if use bind ; then
+		einfo "Setting bind9 reload command"
+		sed -e 's|'bind_enable', '0'|'bind_enable', '1'|g' -i "${S}/install/froxlor.sql" || die "Unable to change binds enabled flag"
+		sed -e 's|/etc/init.d/bind9 reload|/etc/init.d/named reload|g' -i "${S}/install/froxlor.sql" || die "Unable to change reload path for Bind"
+	fi
+
+	if use pdns ; then
+		einfo "Switching from 'bind' to 'powerdns'"
+		sed -e 's|'bind_enable', '0'|'bind_enable', '1'|g' -i "${S}/install/froxlor.sql" || die "Unable to change binds enabled flag"
+		sed -e 's|/etc/init.d/bind9 reload|/etc/init.d/pdns restart|g' -i "${S}/install/froxlor.sql" || die "Unable to change reload path for pdns"
+		sed -e 's|'dns_server', 'bind'|'dns_server', 'pdns'|g' -i "${S}/install/froxlor.sql" || die "Unable to change dns-server value from bind to pdns"
+		ewarn ""
+		ewarn "Note that you need to configure pdns and create a separate database for it, see:"
+		ewarn "https://doc.powerdns.com/3/authoritative/installation/#basic-setup-configuring-database-connectivity"
+		ewarn ""
 	fi
 
 	# default value is logging_enabled='1'
@@ -254,7 +274,7 @@ src_install() {
 	# Install the Froxlor files
 	einfo "Installing Froxlor files"
 	dodir ${FROXLOR_DOCROOT}
-	cp -Rf "${S}/" "${D}${FROXLOR_DOCROOT}/" || die "Installation of the Froxlor files failed"
+	cp -R "${S}/" "${D}${FROXLOR_DOCROOT}/" || die "Installation of the Froxlor files failed"
 }
 
 pkg_postinst() {
@@ -272,7 +292,7 @@ pkg_postinst() {
 		elog "to /etc/cron.d/froxlor and remove /etc/cron.d/syscp"
 	else
 		elog "Please open http://[ip]/froxlor in your browser to continue"
-		elog "continue with the basic setup of Froxlor."
+		elog "with the basic setup of Froxlor."
 		elog
 		elog "Don't forget to setup your MySQL databases root user and password"
 		elog "using emerge --config mysql"
