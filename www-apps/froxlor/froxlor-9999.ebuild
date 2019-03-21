@@ -26,7 +26,7 @@ DEPEND="
 	!www-apps/syscp
 	>=mail-mta/postfix-2.4[mysql,ssl=]
 	virtual/cron
-	>=dev-lang/php-5.3:*[bcmath,cli,ctype,curl,filter,ftp,gd,mysql,nls,pcntl,pdo,posix,session,simplexml,ssl=,tokenizer,unicode,xml,xslt,zlib]
+	>=dev-lang/php-5.3:*[bcmath,cli,ctype,curl,filter,gd,mysql,nls,pcntl,pdo,posix,session,simplexml,ssl=,tokenizer,unicode,xml,xslt,zlib,zip]
 	pureftpd? (
 		net-ftp/pure-ftpd[mysql,ssl=]
 	)
@@ -87,6 +87,12 @@ DEPEND="
 			sys-auth/libnss-extrausers
 			sys-auth/libnss-mysql
 		)
+			( !lighttpd? (
+				!nginx? (
+					www-servers/apache[apache2_modules_proxy_fcgi]
+					)
+				)
+			)
 	)
 	dovecot? ( >=net-mail/dovecot-2.2.0[mysql]
 		   >=mail-mta/postfix-2.4[dovecot-sasl]
