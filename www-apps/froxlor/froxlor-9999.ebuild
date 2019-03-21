@@ -77,8 +77,7 @@ DEPEND="
 		)
 			( !lighttpd? (
 				!nginx? (
-					www-servers/apache[suexec]
-					www-apache/mod_fcgid
+					www-servers/apache[apache2_modules_proxy_fcgi]
 					)
 				)
 			)
