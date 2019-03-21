@@ -3,7 +3,7 @@
 
 EAPI=5
 
-inherit epatch
+inherit epatch multilib
 
 DESCRIPTION="nss module to have an additional passwd, shadow and group file"
 HOMEPAGE="https://sources.debian.org/src/libnss-extrausers/0.6-4/"
@@ -25,5 +25,5 @@ src_compile() {
 }
 
 src_install() {
-	emake DESTDIR="${D}" libprefix="${D}/usr/${get_libdir}" install
+	emake DESTDIR="${D}" libprefix="${get_libdir}" install
 }
