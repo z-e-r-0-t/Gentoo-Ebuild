@@ -1,23 +1,22 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="5"
-
-inherit eutils
+EAPI="7"
 
 if [[ ${PV} = "9999" ]] ; then
 	EGIT_REPO_URI="https://github.com/Froxlor/Froxlor.git"
+	EGIT_BRANCH="0.9.x"
 	EGIT_CHECKOUT_DIR=${WORKDIR}/${PN}
 	inherit git-r3
 	KEYWORDS=""
 else
 	RESTRICT="mirror"
-	SRC_URI="http://files.froxlor.org/releases/${P}.tar.gz"
+	SRC_URI="https://files.froxlor.org/releases/${P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
 fi
 
 DESCRIPTION="A PHP-based webhosting-oriented control panel for servers."
-HOMEPAGE="http://www.froxlor.org/"
+HOMEPAGE="https://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -27,7 +26,6 @@ DEPEND="
 	!www-apps/syscp
 	>=mail-mta/postfix-2.4[mysql,ssl=]
 	virtual/cron
-	virtual/mysql
 	>=dev-lang/php-5.3:*[bcmath,cli,ctype,curl,filter,ftp,gd,mysql,nls,pcntl,pdo,posix,session,simplexml,ssl=,tokenizer,unicode,xml,xslt,zlib]
 	pureftpd? (
 		net-ftp/pure-ftpd[mysql,ssl=]
@@ -73,7 +71,10 @@ DEPEND="
 		)
 	)
 	fcgid? ( dev-lang/php:*[cgi]
-		 sys-auth/libnss-mysql
+		|| (
+			sys-auth/libnss-extrausers
+			sys-auth/libnss-mysql
+		)
 			( !lighttpd? (
 				!nginx? (
 					www-servers/apache[suexec]
@@ -83,7 +84,10 @@ DEPEND="
 			)
 	)
 	fpm? ( dev-lang/php:*[fpm]
-		sys-auth/libnss-mysql
+		|| (
+			sys-auth/libnss-extrausers
+			sys-auth/libnss-mysql
+		)
 	)
 	dovecot? ( >=net-mail/dovecot-2.2.0[mysql,ssl=]
 		   >=mail-mta/postfix-2.4[dovecot-sasl]
@@ -117,10 +121,6 @@ src_unpack() {
 	else
 		unpack ${A}
 	fi
-}
-
-src_prepare() {
-	epatch_user
 }
 
 src_install() {
