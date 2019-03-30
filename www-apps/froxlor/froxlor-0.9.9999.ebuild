@@ -121,7 +121,7 @@ FROXLOR_DOCROOT="${FROXLOR_DOCROOT:-/var/www}"
 S="${WORKDIR}/${PN}"
 
 src_unpack() {
-	if [[ ${PV} == "9999" ]] ; then
+	if [[ ${PV} == *9999 ]] ; then
 		git-r3_src_unpack
 	else
 		unpack ${A}
