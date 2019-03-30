@@ -3,7 +3,7 @@
 
 EAPI="7"
 
-if [[ ${PV} = "9999" ]] ; then
+if [[ ${PV} == *9999 ]] ; then
 	EGIT_REPO_URI="https://github.com/Froxlor/Froxlor.git"
 	EGIT_BRANCH="0.9.x"
 	EGIT_CHECKOUT_DIR=${WORKDIR}/${PN}
