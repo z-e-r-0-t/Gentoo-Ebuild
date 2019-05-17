@@ -89,7 +89,7 @@ DEPEND="
 			sys-auth/libnss-mysql
 		)
 	)
-	dovecot? ( >=net-mail/dovecot-2.2.0[mysql,ssl=]
+	dovecot? ( >=net-mail/dovecot-2.2.0[mysql]
 		   >=mail-mta/postfix-2.4[dovecot-sasl]
 	)
 	!dovecot? ( dev-libs/cyrus-sasl[mysql,ssl=]
