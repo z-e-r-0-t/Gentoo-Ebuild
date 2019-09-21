@@ -45,7 +45,7 @@ DEPEND="
 	!awstats? (
 		app-admin/webalizer
 	)
-	bind? ( net-dns/bind[ssl=]
+	bind? ( net-dns/bind
 		domainkey? ( mail-filter/opendkim[ssl=,libressl=] )
 	)
 	pdns? ( net-dns/pdns[mysql]
@@ -270,6 +270,7 @@ src_install() {
 	# Install the Froxlor files
 	einfo "Installing Froxlor files"
 	dodir ${FROXLOR_DOCROOT}
+	egit_clean
 	cp -R "${S}/" "${D}${FROXLOR_DOCROOT}/" || die "Installation of the Froxlor files failed"
 }
 

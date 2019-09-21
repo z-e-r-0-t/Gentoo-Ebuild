@@ -47,7 +47,7 @@ DEPEND="
 	!awstats? (
 		app-admin/webalizer
 	)
-	bind? ( net-dns/bind[ssl=]
+	bind? ( net-dns/bind
 		domainkey? ( mail-filter/opendkim[ssl=,libressl=] )
 	)
 	pdns? ( net-dns/pdns[mysql]

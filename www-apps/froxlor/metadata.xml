@@ -27,6 +27,7 @@
     <flag name='vsftpd'>use vsFTPd instead of ProFTPd</flag>
   </use>
   <upstream>
+    <remote-id type="cpe">cpe:/a:froxlor:froxlor</remote-id>
     <remote-id type="github">Froxlor/Froxlor</remote-id>
   </upstream>
 </pkgmetadata>
