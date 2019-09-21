@@ -6,7 +6,7 @@ EAPI="7"
 if [[ ${PV} == *9999 ]] ; then
 	EGIT_REPO_URI="https://github.com/Froxlor/Froxlor.git"
 	EGIT_CHECKOUT_DIR=${WORKDIR}/${PN}
-	inherit git-r3
+	inherit git-r3 vcs-clean
 	KEYWORDS=""
 else
 	RESTRICT="mirror"
