@@ -24,7 +24,7 @@ IUSE="awstats bind domainkey +dovecot fcgid ftpquota fpm libressl lighttpd +log 
 DEPEND="
 	>=mail-mta/postfix-2.4[mysql,ssl=]
 	virtual/cron
-	>=dev-lang/php-5.3:*[bcmath,cli,ctype,curl,filter,gd,mysql,nls,pcntl,pdo,posix,session,simplexml,ssl=,tokenizer,unicode,xml,xslt,zlib,zip]
+	>=dev-lang/php-7.0:*[bcmath,cli,ctype,curl,filter,gd,mysql,nls,pcntl,pdo,posix,session,simplexml,ssl=,tokenizer,unicode,xml,xslt,zlib,zip]
 	pureftpd? (
 		net-ftp/pure-ftpd[mysql,ssl=]
 	)

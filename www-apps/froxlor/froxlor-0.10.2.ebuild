@@ -3,11 +3,10 @@
 
 EAPI="7"
 
-if [[ ${PV} = "9999" ]] ; then
+if [[ ${PV} == *9999 ]] ; then
 	EGIT_REPO_URI="https://github.com/Froxlor/Froxlor.git"
-	EGIT_BRANCH="0.9.x"
 	EGIT_CHECKOUT_DIR=${WORKDIR}/${PN}
-	inherit git-r3
+	inherit git-r3 vcs-clean
 	KEYWORDS=""
 else
 	RESTRICT="mirror"
@@ -20,13 +19,12 @@ HOMEPAGE="https://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="awstats bind domainkey +dovecot fcgid ftpquota fpm libressl lighttpd +log mailquota nginx pdns pureftpd quota ssl +tickets vsftpd"
+IUSE="awstats bind domainkey +dovecot fcgid ftpquota fpm libressl lighttpd +log mailquota nginx pdns pureftpd quota ssl vsftpd"
 
 DEPEND="
-	!www-apps/syscp
 	>=mail-mta/postfix-2.4[mysql,ssl=]
 	virtual/cron
-	>=dev-lang/php-5.3:*[bcmath,cli,ctype,curl,filter,ftp,gd,mysql,nls,pcntl,pdo,posix,session,simplexml,ssl=,tokenizer,unicode,xml,xslt,zlib]
+	>=dev-lang/php-7.0:*[bcmath,cli,ctype,curl,filter,gd,mysql,nls,pcntl,pdo,posix,session,simplexml,ssl=,tokenizer,unicode,xml,xslt,zlib,zip]
 	pureftpd? (
 		net-ftp/pure-ftpd[mysql,ssl=]
 	)
@@ -77,8 +75,7 @@ DEPEND="
 		)
 			( !lighttpd? (
 				!nginx? (
-					www-servers/apache[suexec]
-					www-apache/mod_fcgid
+					www-servers/apache[apache2_modules_proxy_fcgi]
 					)
 				)
 			)
@@ -88,6 +85,12 @@ DEPEND="
 			sys-auth/libnss-extrausers
 			sys-auth/libnss-mysql
 		)
+			( !lighttpd? (
+				!nginx? (
+					www-servers/apache[apache2_modules_proxy_fcgi]
+					)
+				)
+			)
 	)
 	dovecot? ( >=net-mail/dovecot-2.2.0[mysql]
 		   >=mail-mta/postfix-2.4[dovecot-sasl]
@@ -116,7 +119,7 @@ FROXLOR_DOCROOT="${FROXLOR_DOCROOT:-/var/www}"
 S="${WORKDIR}/${PN}"
 
 src_unpack() {
-	if [[ ${PV} == "9999" ]] ; then
+	if [[ ${PV} == *9999 ]] ; then
 		git-r3_src_unpack
 	else
 		unpack ${A}
@@ -232,12 +235,6 @@ src_install() {
 		sed -e "s|'logger', 'enabled', '1'|'logger', 'enabled', '0'|g" -i "${S}/install/froxlor.sql" || die "Unable to set logging to 'Off'"
 	fi
 
-	# default value is tickets_enabled='1'
-	if ! use tickets ; then
-		einfo "Switching 'tickets' to 'Off'"
-		sed -e "s|'ticket', 'enabled', '1'|'ticket', 'enabled', '0'|g" -i "${S}/install/froxlor.sql" || die "Unable to set ticketsystem to 'Off'"
-	fi
-
 	# default value is mailquota='0'
 	if use mailquota ; then
 		einfo "Switching 'mailquota' to 'On'"
@@ -273,6 +270,7 @@ src_install() {
 	# Install the Froxlor files
 	einfo "Installing Froxlor files"
 	dodir ${FROXLOR_DOCROOT}
+	egit_clean
 	cp -R "${S}/" "${D}${FROXLOR_DOCROOT}/" || die "Installation of the Froxlor files failed"
 }
 
