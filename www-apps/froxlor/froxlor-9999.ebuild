@@ -126,11 +126,11 @@ src_unpack() {
 	fi
 }
 
-src_prepare()
+src_prepare() {
 	if [[ ${PV} == *9999 ]] ; then
 		egit_clean
-	else
 	fi
+	default
 }
 
 src_install() {

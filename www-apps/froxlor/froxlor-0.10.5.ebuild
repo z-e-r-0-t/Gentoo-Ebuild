@@ -126,6 +126,13 @@ src_unpack() {
 	fi
 }
 
+src_prepare() {
+	if [[ ${PV} == *9999 ]] ; then
+		egit_clean
+	fi
+	default
+}
+
 src_install() {
 	# set default language
 	local MYLANG=""
@@ -270,7 +277,6 @@ src_install() {
 	# Install the Froxlor files
 	einfo "Installing Froxlor files"
 	dodir ${FROXLOR_DOCROOT}
-	egit_clean
 	cp -R "${S}/" "${D}${FROXLOR_DOCROOT}/" || die "Installation of the Froxlor files failed"
 }
 
