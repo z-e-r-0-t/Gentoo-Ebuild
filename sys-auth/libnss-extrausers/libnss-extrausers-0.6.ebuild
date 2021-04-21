@@ -1,9 +1,7 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
-
-inherit epatch multilib
+EAPI=7
 
 DESCRIPTION="nss module to have an additional passwd, shadow and group file"
 HOMEPAGE="https://sources.debian.org/src/libnss-extrausers/0.6-4/"
@@ -15,8 +13,9 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
 src_prepare() {
-	local d="${WORKDIR}"/debian/patches
-	EPATCH_SOURCE="${d}" epatch $(<"${d}"/series)
+	for patch in $(< "${WORKDIR}"/debian/patches/series); do
+		eapply "${WORKDIR}"/debian/patches/${patch}
+	done
 	default
 }
 
@@ -25,5 +24,5 @@ src_compile() {
 }
 
 src_install() {
-	emake DESTDIR="${D}usr/" libprefix="$(get_libdir)" install
+	emake DESTDIR="${D}" libprefix="/usr/$(get_libdir)" install
 }
