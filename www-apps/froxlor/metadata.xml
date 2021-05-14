@@ -23,7 +23,6 @@
     <flag name='pdns'>use Power-DNS instead of Bind</flag>
     <flag name='pureftpd'>use pure-FTPd instead of ProFTPd</flag>
     <flag name='quota'>Adds support for Filesystem-Quotas</flag>
-    <flag name='tickets'>Adds support for the Ticket System</flag>
     <flag name='vsftpd'>use vsFTPd instead of ProFTPd</flag>
   </use>
   <upstream>
