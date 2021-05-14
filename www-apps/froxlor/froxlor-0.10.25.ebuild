@@ -19,12 +19,12 @@ HOMEPAGE="https://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="awstats bind domainkey +dovecot fcgid ftpquota fpm libressl lighttpd +log mailquota nginx pdns pureftpd quota ssl vsftpd"
+IUSE="awstats bind domainkey +dovecot fcgid ftpquota fpm lighttpd +log mailquota nginx pdns pureftpd quota ssl vsftpd"
 
 DEPEND="
 	>=mail-mta/postfix-2.4[mysql,ssl=]
 	virtual/cron
-	>=dev-lang/php-7.0:*[bcmath,cli,ctype,curl,filter,gd,mysql,nls,pcntl,pdo,posix,session,simplexml,ssl=,tokenizer,unicode,xml,xslt,zlib,zip]
+	>=dev-lang/php-7.1:*[bcmath,cli,ctype,curl,filter,gd,json,mysql,nls,pcntl,pdo,posix,session,simplexml,ssl=,tokenizer,unicode,xml,xslt,zlib,zip]
 	pureftpd? (
 		net-ftp/pure-ftpd[mysql,ssl=]
 	)
@@ -46,15 +46,12 @@ DEPEND="
 		app-admin/webalizer
 	)
 	bind? ( net-dns/bind
-		domainkey? ( mail-filter/opendkim[ssl=,libressl=] )
+		domainkey? ( mail-filter/opendkim[ssl=] )
 	)
 	pdns? ( net-dns/pdns[mysql]
-		domainkey? ( mail-filter/opendkim[ssl=,libressl=] )
+		domainkey? ( mail-filter/opendkim[ssl=] )
 	)
-	ssl? (
-		!libressl? ( >=dev-libs/openssl-1.0.2:* )
-		libressl? ( dev-libs/libressl:= )
-	)
+	ssl? ( dev-libs/openssl )
 	lighttpd? ( www-servers/lighttpd[php,ssl=] )
 	nginx? (
 		www-servers/nginx:*[ssl=]
