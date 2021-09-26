@@ -16,5 +16,4 @@ www-apps/froxlor:nginx - use nginx instead of Apache
 www-apps/froxlor:pdns - use Power-DNS instead of Bind
 www-apps/froxlor:pureftpd - use pure-FTPd instead of ProFTPd
 www-apps/froxlor:quota - Adds support for Filesystem-Quotas
-www-apps/froxlor:tickets - Adds support for the Ticket System
 www-apps/froxlor:vsftpd - use vsFTPd instead of ProFTPd
