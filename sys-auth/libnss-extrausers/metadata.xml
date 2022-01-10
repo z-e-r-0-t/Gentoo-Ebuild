@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="person">
+    <email>release@froxlor.org</email>
+      <description>Upstream Provider</description>
+  </maintainer>
+  <longdescription>nss module to have an additional passwd, shadow and group file.</longdescription>
+</pkgmetadata>
