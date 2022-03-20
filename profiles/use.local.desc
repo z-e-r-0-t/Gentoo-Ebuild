@@ -4,7 +4,6 @@
 
 www-apps/froxlor:awstats - use AWStats instead of Webalizer
 www-apps/froxlor:bind - Adds support for writing BIND configuration files
-www-apps/froxlor:domainkey - Adds support for writing DKIM DNS-Records and Filters for them
 www-apps/froxlor:dovecot - use Dovecot instead of Courier
 www-apps/froxlor:fcgid - Adds support for FCGId
 www-apps/froxlor:fpm - Adds support for PHP-FPM
@@ -16,4 +15,3 @@ www-apps/froxlor:nginx - use nginx instead of Apache
 www-apps/froxlor:pdns - use Power-DNS instead of Bind
 www-apps/froxlor:pureftpd - use pure-FTPd instead of ProFTPd
 www-apps/froxlor:quota - Adds support for Filesystem-Quotas
-www-apps/froxlor:vsftpd - use vsFTPd instead of ProFTPd

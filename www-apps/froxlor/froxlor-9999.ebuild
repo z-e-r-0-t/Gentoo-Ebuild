@@ -1,7 +1,7 @@
 # Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="7"
+EAPI="8"
 
 if [[ ${PV} == *9999 ]] ; then
 	EGIT_REPO_URI="https://github.com/Froxlor/Froxlor.git"
@@ -19,7 +19,7 @@ HOMEPAGE="https://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="awstats bind +dovecot fcgid ftpquota fpm lighttpd +log mailquota nginx pdns pureftpd quota ssl"
+IUSE="awstats bind +dovecot fcgid fpm ftpquota lighttpd +log mailquota nginx pdns pureftpd quota ssl"
 
 DEPEND="
 	virtual/mysql
