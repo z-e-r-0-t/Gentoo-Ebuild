@@ -7,12 +7,13 @@
   </maintainer>
   <longdescription>A PHP-based webhosting-oriented control panel for servers.</longdescription>
   <use>
-    <flag name='awstats'>use AWStats instead of Webalizer</flag>
+    <flag name='awstats'>use AWStats traffic analyzer</flag>
     <flag name='bind'>Adds support for writing BIND configuration files</flag>
     <flag name='dovecot'>use Dovecot instead of Courier</flag>
     <flag name='fcgid'>Adds support for FCGId</flag>
-    <flag name='ftpquota'>Adds support for FTP Quotas for use with ProFTPd</flag>
     <flag name='fpm'>Adds support for PHP-FPM</flag>
+    <flag name='ftpquota'>Adds support for FTP Quotas for use with ProFTPd</flag>
+    <flag name='goaccess'>use goaccess traffic analyzer</flag>
     <flag name='lighttpd'>use ligHTTPd instead of Apache</flag>
     <flag name='log'>Adds support for logging actions in the Panel</flag>
     <flag name='mailquota'>Adds support for Quotas for the maildirs of
