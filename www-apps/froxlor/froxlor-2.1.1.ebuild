@@ -85,11 +85,6 @@ DEPEND="
 	dovecot? ( >=net-mail/dovecot-2.2.0[mysql]
 		   >=mail-mta/postfix-2.4[dovecot-sasl]
 	)
-	!dovecot? ( dev-libs/cyrus-sasl[mysql,ssl=]
-		    net-libs/courier-authlib[mysql]
-		    net-mail/courier-imap
-		    >=mail-mta/postfix-2.4[sasl]
-	)
 	quota? ( sys-fs/quotatool )"
 
 RDEPEND="${DEPEND}"
