@@ -102,12 +102,6 @@ REQUIRED_USE="
     pdns? ( !bind )
     postfix? ( dovecot )"
 
-# we need that to set the standardlanguage later
-LANGS="cs de en fr it nl pt sv"
-for X in ${LANGS} ; do
-	IUSE="${IUSE} l10n_${X}"
-done
-
 # lets check user defined variables
 FROXLOR_DOCROOT="${FROXLOR_DOCROOT:-/var/www}"
 
@@ -129,29 +123,6 @@ src_prepare() {
 }
 
 src_install() {
-	# set default language
-	local MYLANG=""
-	if use l10n_de ; then
-		MYLANG="Deutsch"
-	elif use l10n_fr ; then
-		MYLANG="Fran&ccedil;ais"
-	elif use l10n_it ; then
-		MYLANG="Italiano"
-	elif use l10n_nl ; then
-		MYLANG="Nederlands"
-	elif use l10n_pt ; then
-		MYLANG="Portugu&ecirc;s"
-	elif use l10n_sv ; then
-		MYLANG="Svenska"
-	elif use l10n_cs ; then
-		MYLANG="&#268;esk&aacute; republika"
-	fi
-
-	if [[ ${MYLANG} != '' ]] ; then
-		einfo "Setting standardlanguage to '${MYLANG}'"
-		sed -e "s|'standardlanguage', 'English'|'standardlanguage', '${MYLANG}'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change default language"
-	fi
-
 	einfo "Setting 'lastguid' to '10000'"
 	sed -e "s|'lastguid', '9999'|'lastguid', '10000'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change lastguid"
 
