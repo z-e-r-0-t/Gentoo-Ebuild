@@ -232,7 +232,6 @@ src_install() {
 
 	# Install the Froxlor files
 	einfo "Installing Froxlor files"
-	dodir "${FROXLOR_DOCROOT}"
 	insinto "${FROXLOR_DOCROOT}"
 	doins -r . || die "Installation of the Froxlor files failed"
 
