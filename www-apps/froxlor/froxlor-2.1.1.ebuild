@@ -103,7 +103,7 @@ REQUIRED_USE="
     postfix? ( dovecot )"
 
 # lets check user defined variables
-FROXLOR_DOCROOT="${FROXLOR_DOCROOT:-/var/www}"
+FROXLOR_DOCROOT="${FROXLOR_DOCROOT:-/var/www/froxlor/}"
 APACHE_DEFAULT_DOCROOT="${APACHE_DEFAULT_DOCROOT:-/var/www/localhost/htdocs/}"
 
 S="${WORKDIR}/${PN}"
@@ -232,15 +232,16 @@ src_install() {
 
 	# Install the Froxlor files
 	einfo "Installing Froxlor files"
-	dodir ${FROXLOR_DOCROOT}
-	cp -R "${S}/" "${D}${FROXLOR_DOCROOT}/" || die "Installation of the Froxlor files failed"
+	dodir "${FROXLOR_DOCROOT}"
+	insinto "${FROXLOR_DOCROOT}"
+	doins -r . || die "Installation of the Froxlor files failed"
 
     # Create symbolic link to froxlor docroot
 	if use apache2; then
 	    if [[ -d "${APACHE_DEFAULT_DOCROOT}" ]]; then
 	        FROXLOR_APACHE_LINK="${APACHE_DEFAULT_DOCROOT}froxlor"
             if [[ ! -L "${FROXLOR_APACHE_LINK}" ]] ; then
-                dosym -r "${ROOT}${FROXLOR_DOCROOT}/${PN}" "${FROXLOR_APACHE_LINK}" || ewarn "Unable to create symlink in htdocs root. Please manually adjust your docroot if necessary."
+                dosym -r "${ROOT}${FROXLOR_DOCROOT}" "${FROXLOR_APACHE_LINK}" || ewarn "Unable to create symlink in htdocs root. Please manually adjust your docroot if necessary."
             fi
         else
             ewarn "Unable to find existing apache default htdocs root. Please manually adjust your docroot if necessary."
@@ -250,7 +251,7 @@ src_install() {
 
 pkg_postinst() {
 	# we need to check if this is going to be an update or a fresh install!
-	if [[ -f "${ROOT}${FROXLOR_DOCROOT}/froxlor/lib/userdata.inc.php" ]] ; then
+	if [[ -f "${ROOT}${FROXLOR_DOCROOT}/lib/userdata.inc.php" ]] ; then
 		elog "Froxlor is already installed on this system!"
 		elog
 		elog "Froxlor will update the database when you open"
