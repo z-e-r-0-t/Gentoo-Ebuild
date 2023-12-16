@@ -104,6 +104,7 @@ REQUIRED_USE="
 
 # lets check user defined variables
 FROXLOR_DOCROOT="${FROXLOR_DOCROOT:-/var/www}"
+APACHE_DEFAULT_DOCROOT="${APACHE_DEFAULT_DOCROOT:-/var/www/localhost/htdocs/}"
 
 S="${WORKDIR}/${PN}"
 
@@ -233,6 +234,18 @@ src_install() {
 	einfo "Installing Froxlor files"
 	dodir ${FROXLOR_DOCROOT}
 	cp -R "${S}/" "${D}${FROXLOR_DOCROOT}/" || die "Installation of the Froxlor files failed"
+
+    # Create symbolic link to froxlor docroot
+	if use apache2; then
+	    if [[ -d "${APACHE_DEFAULT_DOCROOT}" ]]; then
+	        FROXLOR_APACHE_LINK="${APACHE_DEFAULT_DOCROOT}froxlor"
+            if [[ ! -L "${FROXLOR_APACHE_LINK}" ]] ; then
+                dosym -r "${ROOT}${FROXLOR_DOCROOT}/${PN}" "${FROXLOR_APACHE_LINK}" || ewarn "Unable to create symlink in htdocs root. Please manually adjust your docroot if necessary."
+            fi
+        else
+            ewarn "Unable to find existing apache default htdocs root. Please manually adjust your docroot if necessary."
+        fi
+    fi
 }
 
 pkg_postinst() {
