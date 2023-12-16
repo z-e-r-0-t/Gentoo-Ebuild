@@ -235,8 +235,11 @@ src_install() {
 	insinto "${FROXLOR_DOCROOT}"
 	doins -r . || die "Installation of the Froxlor files failed"
 
-    # Create symbolic link to froxlor docroot
 	if use apache2; then
+	    # Ensure dir is writable by apache
+	    fowners -R apache:apache "${FROXLOR_DOCROOT}"
+
+	    # Create symbolic link to froxlor docroot
 	    if [[ -d "${APACHE_DEFAULT_DOCROOT}" ]]; then
 	        FROXLOR_APACHE_LINK="${APACHE_DEFAULT_DOCROOT}froxlor"
             if [[ ! -L "${FROXLOR_APACHE_LINK}" ]] ; then
