@@ -255,12 +255,6 @@ pkg_postinst() {
 		elog
 		elog "Froxlor will update the database when you open"
 		elog "it in your browser the first time after the update-process"
-	elif [[ -f "${ROOT}${FROXLOR_DOCROOT}/syscp/lib/userdata.inc.php" ]] ; then
-		elog "This seems to be an upgrade from syscp"
-		elog "please move ${FROXLOR_DOCROOT}/syscp/lib/userdata.inc.php to"
-		elog "${FROXLOR_DOCROOT}/froxlor/lib/"
-		elog "and don't forget to copy "${ROOT}/usr/share/${PN}/froxlor.cron""
-		elog "to /etc/cron.d/froxlor and remove /etc/cron.d/syscp"
 	else
 		elog "Please open http://[ip]/froxlor in your browser to continue"
 		elog "with the basic setup of Froxlor."
