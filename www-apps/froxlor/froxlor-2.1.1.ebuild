@@ -19,7 +19,7 @@ HOMEPAGE="https://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="awstats goaccess webalizer bind +dovecot fcgid fpm ftpquota lighttpd +log mailquota nginx pdns +postfix +proftpd pureftpd quota ssl"
+IUSE="awstats goaccess webalizer +apache2 bind +dovecot fcgid fpm ftpquota lighttpd +log mailquota nginx pdns +postfix +proftpd pureftpd quota ssl"
 
 DEPEND="
 	virtual/mysql
@@ -44,42 +44,41 @@ DEPEND="
 	bind? ( net-dns/bind )
 	pdns? ( net-dns/pdns[mysql] )
 	ssl? ( dev-libs/openssl )
+	apache2? (
+	    www-servers/apache[ssl=]
+		!fpm? (
+			dev-lang/php:*[apache2]
+			)
+	)
 	lighttpd? ( www-servers/lighttpd[php,ssl=] )
 	nginx? (
 		www-servers/nginx:*[ssl=]
 	)
-	!lighttpd? (
-		( !nginx? (
-			www-servers/apache[ssl=]
-			!fpm? (
-				dev-lang/php:*[apache2]
-				)
-			)
-		)
+	fcgid? (
+	    dev-lang/php:*[cgi]
+		||
+            (
+                sys-auth/libnss-extrausers
+                sys-auth/libnss-mysql
+            )
+            (
+                apache2? (
+                    www-servers/apache[apache2_modules_proxy_fcgi]
+                )
+            )
 	)
-	fcgid? ( dev-lang/php:*[cgi]
-		|| (
-			sys-auth/libnss-extrausers
-			sys-auth/libnss-mysql
-		)
-			( !lighttpd? (
-				!nginx? (
-					www-servers/apache[apache2_modules_proxy_fcgi]
-					)
-				)
-			)
-	)
-	fpm? ( dev-lang/php:*[fpm]
-		|| (
-			sys-auth/libnss-extrausers
-			sys-auth/libnss-mysql
-		)
-			( !lighttpd? (
-				!nginx? (
-					www-servers/apache[apache2_modules_proxy_fcgi]
-					)
-				)
-			)
+	fpm? (
+	    dev-lang/php:*[fpm]
+		||
+            (
+                sys-auth/libnss-extrausers
+                sys-auth/libnss-mysql
+            )
+            (
+                apache2? (
+                    www-servers/apache[apache2_modules_proxy_fcgi]
+                )
+            )
 	)
 	dovecot? (
 	    >=net-mail/dovecot-2.2.0[mysql]
