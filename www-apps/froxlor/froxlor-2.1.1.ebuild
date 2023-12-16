@@ -120,10 +120,9 @@ src_prepare() {
 	if [[ ${PV} == *9999 ]] ; then
 		egit_clean
 	fi
-	default
-}
 
-src_install() {
+	default
+
 	einfo "Setting 'lastguid' to '10000'"
 	sed -e "s|'lastguid', '9999'|'lastguid', '10000'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change lastguid"
 
@@ -229,11 +228,11 @@ src_install() {
 		einfo "Switching from 'ProFTPd' to 'Pure-FTPd'"
 		sed -e "s|'ftpserver', 'proftpd'|'ftpserver', 'pureftpd'|g" -i "${S}/install/froxlor.sql.php"
 	fi
+}
 
-	# Install the Froxlor files
-	einfo "Installing Froxlor files"
+src_install() {
 	insinto "${FROXLOR_DOCROOT}"
-	doins -r . || die "Installation of the Froxlor files failed"
+	doins -r .
 
 	if use apache2; then
 	    # Ensure dir is writable by apache
