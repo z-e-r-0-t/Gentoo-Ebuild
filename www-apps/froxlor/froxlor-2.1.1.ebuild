@@ -92,7 +92,15 @@ DEPEND="
 
 RDEPEND="${DEPEND}"
 
-REQUIRED_USE="lighttpd? ( !nginx ) fcgid? ( !fpm ) pdns? ( !bind ) postfix? ( dovecot )"
+REQUIRED_USE="
+    ^^ (
+        apache2
+        lighttpd
+        nginx
+    )
+    fcgid? ( !fpm )
+    pdns? ( !bind )
+    postfix? ( dovecot )"
 
 # we need that to set the standardlanguage later
 LANGS="cs de en fr it nl pt sv"
