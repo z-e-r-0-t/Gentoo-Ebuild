@@ -234,6 +234,8 @@ src_install() {
 	insinto "${FROXLOR_DOCROOT}"
 	doins -r .
 
+	fperms 0755 "${FROXLOR_DOCROOT}/bin/froxlor-cli"
+
 	if use apache2; then
 	    # Ensure dir is writable by apache
 	    fowners -R apache:apache "${FROXLOR_DOCROOT}"
