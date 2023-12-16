@@ -86,6 +86,9 @@ DEPEND="
 	postfix? (
 	    >=mail-mta/postfix-2.4[dovecot-sasl,mysql,ssl=]
 	)
+	log? (
+	    app-admin/logrotate
+	)
 	quota? (
 	    sys-fs/quotatool
 	)"
