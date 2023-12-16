@@ -19,11 +19,10 @@ HOMEPAGE="https://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="awstats goaccess webalizer bind +dovecot fcgid fpm ftpquota lighttpd +log mailquota nginx pdns pureftpd quota ssl"
+IUSE="awstats goaccess webalizer bind +dovecot fcgid fpm ftpquota lighttpd +log mailquota nginx pdns +postfix pureftpd quota ssl"
 
 DEPEND="
 	virtual/mysql
-	>=mail-mta/postfix-2.4[mysql,ssl=]
 	virtual/cron
 	>=dev-lang/php-7.4:*[bcmath,cli,ctype,curl,filter,gd,gmp,mysql,pdo,posix,session,xml,zip]
 	pureftpd? (
@@ -82,14 +81,19 @@ DEPEND="
 				)
 			)
 	)
-	dovecot? ( >=net-mail/dovecot-2.2.0[mysql]
-		   >=mail-mta/postfix-2.4[dovecot-sasl]
+	dovecot? (
+	    >=net-mail/dovecot-2.2.0[mysql]
 	)
-	quota? ( sys-fs/quotatool )"
+	postfix? (
+	    >=mail-mta/postfix-2.4[dovecot-sasl,mysql,ssl=]
+	)
+	quota? (
+	    sys-fs/quotatool
+	)"
 
 RDEPEND="${DEPEND}"
 
-REQUIRED_USE="lighttpd? ( !nginx ) fcgid? ( !fpm ) pdns? ( !bind )"
+REQUIRED_USE="lighttpd? ( !nginx ) fcgid? ( !fpm ) pdns? ( !bind ) postfix? ( dovecot )"
 
 # we need that to set the standardlanguage later
 LANGS="cs de en fr it nl pt sv"
