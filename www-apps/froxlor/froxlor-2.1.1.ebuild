@@ -25,7 +25,7 @@ DEPEND="
 	virtual/mysql
 	>=mail-mta/postfix-2.4[mysql,ssl=]
 	virtual/cron
-	>=dev-lang/php-7.4:*[bcmath,cli,ctype,curl,filter,gd,json(+),mysql,nls,pcntl,pdo,posix,session,simplexml,ssl=,tokenizer,unicode,xml,xslt,zlib,zip]
+	>=dev-lang/php-7.4:*[bcmath,cli,ctype,curl,filter,gd,gmp,mysql,pdo,posix,session,xml,zip]
 	pureftpd? (
 		net-ftp/pure-ftpd[mysql,ssl=]
 	)
