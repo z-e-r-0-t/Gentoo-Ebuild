@@ -263,10 +263,16 @@ pkg_postinst() {
 		elog "Froxlor will update the database when you open"
 		elog "it in your browser the first time after the update-process"
 	else
+	    if use apache2; then
+	        if ! use fpm && ! use fcgid ; then
+                elog "Don't forget to enable mod_php in /etc/conf.d/apache2 by adding \" -D PHP\" to APACHE2_OPTS var."
+                elog
+            fi
+	    fi
+	    elog "Don't forget to setup your MySQL databases root user and password"
+		elog "using \"emerge --config mysql\" or \"emerge --config mariadb\""
+		elog
 		elog "Please open http://[ip]/froxlor in your browser to continue"
 		elog "with the basic setup of Froxlor."
-		elog
-		elog "Don't forget to setup your MySQL databases root user and password"
-		elog "using emerge --config mysql"
 	fi
 }
