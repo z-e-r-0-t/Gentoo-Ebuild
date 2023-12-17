@@ -246,9 +246,7 @@ src_install() {
 		# Create symbolic link to froxlor docroot
 		if [[ -d "${APACHE_DEFAULT_DOCROOT}" ]]; then
 			FROXLOR_APACHE_LINK="${APACHE_DEFAULT_DOCROOT}froxlor"
-			if [[ ! -L "${FROXLOR_APACHE_LINK}" ]] ; then
-				dosym -r "${ROOT}${FROXLOR_DOCROOT}" "${FROXLOR_APACHE_LINK}" || ewarn "Unable to create symlink in htdocs root. Please manually adjust your docroot if necessary."
-			fi
+			dosym -r "${ROOT}${FROXLOR_DOCROOT}" "${FROXLOR_APACHE_LINK}" || ewarn "Unable to create symlink in htdocs root. Please manually adjust your docroot if necessary."
 		else
 			ewarn "Unable to find existing apache default htdocs root. Please manually adjust your docroot if necessary."
 		fi
