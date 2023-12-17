@@ -33,7 +33,7 @@ DEPEND="
 		ftpquota? ( net-ftp/proftpd[softquota] )
 	)
 	goaccess? (
-		net-analyzer/goaccess 
+		net-analyzer/goaccess
 	)
 	awstats? (
 		www-misc/awstats
@@ -45,7 +45,7 @@ DEPEND="
 	pdns? ( net-dns/pdns[mysql] )
 	ssl? ( dev-libs/openssl )
 	apache2? (
-	    www-servers/apache[ssl=]
+		www-servers/apache[ssl=]
 		!fpm? (
 			dev-lang/php:*[apache2]
 			)
@@ -55,55 +55,55 @@ DEPEND="
 		www-servers/nginx:*[ssl=]
 	)
 	fcgid? (
-	    dev-lang/php:*[cgi]
+		dev-lang/php:*[cgi]
 		||
-            (
-                sys-auth/libnss-extrausers
-                sys-auth/libnss-mysql
-            )
-            (
-                apache2? (
-                    www-servers/apache[apache2_modules_proxy_fcgi]
-                )
-            )
+			(
+				sys-auth/libnss-extrausers
+				sys-auth/libnss-mysql
+			)
+			(
+				apache2? (
+					www-servers/apache[apache2_modules_proxy_fcgi]
+				)
+			)
 	)
 	fpm? (
-	    dev-lang/php:*[fpm]
+		dev-lang/php:*[fpm]
 		||
-            (
-                sys-auth/libnss-extrausers
-                sys-auth/libnss-mysql
-            )
-            (
-                apache2? (
-                    www-servers/apache[apache2_modules_proxy_fcgi]
-                )
-            )
+			(
+				sys-auth/libnss-extrausers
+				sys-auth/libnss-mysql
+			)
+			(
+				apache2? (
+					www-servers/apache[apache2_modules_proxy_fcgi]
+				)
+			)
 	)
 	dovecot? (
-	    >=net-mail/dovecot-2.2.0[mysql]
+		>=net-mail/dovecot-2.2.0[mysql]
 	)
 	postfix? (
-	    >=mail-mta/postfix-2.4[dovecot-sasl,mysql,ssl=]
+		>=mail-mta/postfix-2.4[dovecot-sasl,mysql,ssl=]
 	)
 	log? (
-	    app-admin/logrotate
+		app-admin/logrotate
 	)
 	quota? (
-	    sys-fs/quotatool
+		sys-fs/quotatool
 	)"
 
 RDEPEND="${DEPEND}"
 
 REQUIRED_USE="
-    ^^ (
-        apache2
-        lighttpd
-        nginx
-    )
-    fcgid? ( !fpm )
-    pdns? ( !bind )
-    postfix? ( dovecot )"
+	^^ (
+		apache2
+		lighttpd
+		nginx
+	)
+	fcgid? ( !fpm )
+	pdns? ( !bind )
+	postfix? ( dovecot )"
 
 # lets check user defined variables
 FROXLOR_DOCROOT="${FROXLOR_DOCROOT:-/var/www/froxlor/}"
@@ -240,19 +240,19 @@ src_install() {
 	fperms 0755 "${FROXLOR_DOCROOT}/bin/froxlor-cli"
 
 	if use apache2; then
-	    # Ensure dir is writable by apache
-	    fowners -R apache:apache "${FROXLOR_DOCROOT}"
+		# Ensure dir is writable by apache
+		fowners -R apache:apache "${FROXLOR_DOCROOT}"
 
-	    # Create symbolic link to froxlor docroot
-	    if [[ -d "${APACHE_DEFAULT_DOCROOT}" ]]; then
-	        FROXLOR_APACHE_LINK="${APACHE_DEFAULT_DOCROOT}froxlor"
-            if [[ ! -L "${FROXLOR_APACHE_LINK}" ]] ; then
-                dosym -r "${ROOT}${FROXLOR_DOCROOT}" "${FROXLOR_APACHE_LINK}" || ewarn "Unable to create symlink in htdocs root. Please manually adjust your docroot if necessary."
-            fi
-        else
-            ewarn "Unable to find existing apache default htdocs root. Please manually adjust your docroot if necessary."
-        fi
-    fi
+		# Create symbolic link to froxlor docroot
+		if [[ -d "${APACHE_DEFAULT_DOCROOT}" ]]; then
+			FROXLOR_APACHE_LINK="${APACHE_DEFAULT_DOCROOT}froxlor"
+			if [[ ! -L "${FROXLOR_APACHE_LINK}" ]] ; then
+				dosym -r "${ROOT}${FROXLOR_DOCROOT}" "${FROXLOR_APACHE_LINK}" || ewarn "Unable to create symlink in htdocs root. Please manually adjust your docroot if necessary."
+			fi
+		else
+			ewarn "Unable to find existing apache default htdocs root. Please manually adjust your docroot if necessary."
+		fi
+	fi
 }
 
 pkg_postinst() {
@@ -263,13 +263,13 @@ pkg_postinst() {
 		elog "Froxlor will update the database when you open"
 		elog "it in your browser the first time after the update-process"
 	else
-	    if use apache2; then
-	        if ! use fpm && ! use fcgid ; then
-                elog "Don't forget to enable mod_php in /etc/conf.d/apache2 by adding \" -D PHP\" to APACHE2_OPTS var."
-                elog
-            fi
-	    fi
-	    elog "Don't forget to setup your MySQL databases root user and password"
+		if use apache2; then
+			if ! use fpm && ! use fcgid ; then
+				elog "Don't forget to enable mod_php in /etc/conf.d/apache2 by adding \" -D PHP\" to APACHE2_OPTS var."
+				elog
+			fi
+		fi
+		elog "Don't forget to setup your MySQL databases root user and password"
 		elog "using \"emerge --config mysql\" or \"emerge --config mariadb\""
 		elog
 		elog "Please open http://[ip]/froxlor in your browser to continue"
