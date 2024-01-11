@@ -263,6 +263,10 @@ pkg_postinst() {
 		elog "it in your browser the first time after the update-process"
 	else
 		if use apache2; then
+			elog "/etc/apache2/modules.d/00_default_settings.conf contains by default "
+			elog "\"<Directory />\\n  ...\\n  Require all denied\n</Directory>\" by default"
+			elog "Remove or comment out this line with \"#\" if u get 403 errors while accessing froxlor"
+			elog ""
 			if ! use fpm && ! use fcgid ; then
 				elog "Don't forget to enable mod_php in /etc/conf.d/apache2 by adding \" -D PHP\" to APACHE2_OPTS var."
 				elog
