@@ -25,6 +25,7 @@ DEPEND="
 	virtual/mysql
 	virtual/cron
 	>=dev-lang/php-7.4:*[bcmath,cli,ctype,curl,filter,gd,gmp,mysql,pdo,posix,session,xml,zip]
+	>=sys-auth/libnss-extrausers-0.6
 	pureftpd? (
 		net-ftp/pure-ftpd[mysql,ssl=]
 	)
