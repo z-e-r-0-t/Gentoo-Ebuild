@@ -35,6 +35,7 @@ DEPEND="
 	)
 	goaccess? (
 		net-analyzer/goaccess
+		app-misc/jq
 	)
 	awstats? (
 		www-misc/awstats
