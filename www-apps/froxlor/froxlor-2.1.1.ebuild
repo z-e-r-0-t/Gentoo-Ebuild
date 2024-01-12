@@ -19,7 +19,7 @@ HOMEPAGE="https://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="awstats goaccess webalizer +apache2 bind +dovecot fcgid fpm ftpquota lighttpd +log mailquota nginx pdns +postfix +proftpd pureftpd quota ssl"
+IUSE="+apache2 awstats bind +dovecot fcgid fpm ftpquota +goaccess lighttpd +log mailquota nginx pdns +postfix +proftpd pureftpd quota ssl webalizer"
 
 DEPEND="
 	virtual/mysql
@@ -101,6 +101,11 @@ REQUIRED_USE="
 		apache2
 		lighttpd
 		nginx
+	)
+	^^ (
+		awstats
+		goaccess
+		webalizer
 	)
 	fcgid? ( !fpm )
 	pdns? ( !bind )
@@ -223,9 +228,25 @@ src_prepare() {
 	fi
 
 	if use awstats ; then
-		einfo "Switching from 'Webalizer' to 'AWStats'"
+		einfo "Enable awstats"
 		sed -e "s|'webalizer_quiet', '2'|'webalizer_quiet', '0'|g" -i "${S}/install/froxlor.sql.php"
-		sed -e "s|'awstats_enabled', '0'|'awstats_enabled', '1'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to enable AWStats"
+		"${FILESDIR}/updateConfig.py" lib/configfiles/gentoo.xml \
+			"./distribution/defaults/default[@settinggroup='system'][@varname='traffictool']" value awstats \
+			|| die "Unable to enable awstats"
+	fi
+
+	if use goaccess ; then
+		einfo "Enable goaccess"
+		"${FILESDIR}/updateConfig.py" lib/configfiles/gentoo.xml \
+			"./distribution/defaults/default[@settinggroup='system'][@varname='traffictool']" value goaccess \
+			|| die "Unable to enable goaccess"
+	fi
+
+	if use webalizer ; then
+		einfo "Enable webalizer"
+		"${FILESDIR}/updateConfig.py" lib/configfiles/gentoo.xml \
+			"./distribution/defaults/default[@settinggroup='system'][@varname='traffictool']" value webalizer \
+			|| die "Unable to enable webalizer"
 	fi
 
 	if use pureftpd ; then
