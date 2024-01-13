@@ -19,7 +19,7 @@ HOMEPAGE="https://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="+apache2 awstats bind +dovecot fcgid fpm ftpquota +goaccess lighttpd +log mailquota nginx pdns +postfix +proftpd pureftpd quota ssl webalizer vsftpd"
+IUSE="+apache2 awstats bind +dovecot fcgid fpm +goaccess lighttpd +log mailquota nginx pdns +postfix +proftpd pureftpd quota ssl webalizer vsftpd"
 
 DEPEND="
 	virtual/mysql
@@ -31,7 +31,9 @@ DEPEND="
 	)
 	proftpd? (
 		net-ftp/proftpd[mysql,ssl=]
-		ftpquota? ( net-ftp/proftpd[softquota] )
+		quota? (
+			net-ftp/proftpd[softquota]
+		)
 	)
 	vsftpd? (
 		net-ftp/vsftpd[pam]
