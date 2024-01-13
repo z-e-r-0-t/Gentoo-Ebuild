@@ -19,7 +19,7 @@ HOMEPAGE="https://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="+apache2 awstats bind +dovecot fcgid fpm +goaccess lighttpd +log mailquota nginx pdns +postfix +proftpd pureftpd quota ssl webalizer vsftpd"
+IUSE="+apache2 awstats bind +dovecot fcgid +fpm +goaccess lighttpd +log mailquota nginx pdns +postfix +proftpd pureftpd quota ssl webalizer vsftpd"
 
 DEPEND="
 	virtual/mysql
@@ -55,8 +55,10 @@ DEPEND="
 	apache2? (
 		www-servers/apache[ssl=]
 		!fpm? (
-			dev-lang/php:*[apache2]
+			!fcgid? (
+				dev-lang/php:*[apache2]
 			)
+		)
 	)
 	lighttpd? ( www-servers/lighttpd[php,ssl=] )
 	nginx? (
@@ -65,13 +67,13 @@ DEPEND="
 	fcgid? (
 		dev-lang/php:*[cgi]
 		apache2? (
-			www-servers/apache[suexec,apache2_modules_proxy_fcgi]
+			www-servers/apache[suexec,apache2_modules_proxy,apache2_modules_proxy_fcgi]
 		)
 	)
 	fpm? (
 		dev-lang/php:*[fpm]
 		apache2? (
-			www-servers/apache[suexec,apache2_modules_proxy_fcgi]
+			www-servers/apache[suexec,apache2_modules_proxy,apache2_modules_proxy_fcgi]
 		)
 	)
 	dovecot? (
