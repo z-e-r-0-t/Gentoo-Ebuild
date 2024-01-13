@@ -19,7 +19,7 @@ HOMEPAGE="https://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="+apache2 awstats bind +dovecot fcgid fpm ftpquota +goaccess lighttpd +log mailquota nginx pdns +postfix +proftpd pureftpd quota ssl webalizer"
+IUSE="+apache2 awstats bind +dovecot fcgid fpm ftpquota +goaccess lighttpd +log mailquota nginx pdns +postfix +proftpd pureftpd quota ssl webalizer vsftpd"
 
 DEPEND="
 	virtual/mysql
@@ -32,6 +32,10 @@ DEPEND="
 	proftpd? (
 		net-ftp/proftpd[mysql,ssl=]
 		ftpquota? ( net-ftp/proftpd[softquota] )
+	)
+	vsftpd? (
+		net-ftp/vsftpd[pam]
+		sys-auth/pam_mysql
 	)
 	goaccess? (
 		net-analyzer/goaccess
@@ -58,32 +62,18 @@ DEPEND="
 	)
 	fcgid? (
 		dev-lang/php:*[cgi]
-		||
-			(
-				sys-auth/libnss-extrausers
-				sys-auth/libnss-mysql
-			)
-			(
-				apache2? (
-					www-servers/apache[apache2_modules_proxy_fcgi]
-				)
-			)
+		apache2? (
+			www-servers/apache[suexec,apache2_modules_proxy_fcgi]
+		)
 	)
 	fpm? (
 		dev-lang/php:*[fpm]
-		||
-			(
-				sys-auth/libnss-extrausers
-				sys-auth/libnss-mysql
-			)
-			(
-				apache2? (
-					www-servers/apache[apache2_modules_proxy_fcgi]
-				)
-			)
+		apache2? (
+			www-servers/apache[suexec,apache2_modules_proxy_fcgi]
+		)
 	)
 	dovecot? (
-		>=net-mail/dovecot-2.2.0[mysql]
+		>=net-mail/dovecot-2.2.0[argon2,managesieve,mysql,sieve]
 	)
 	postfix? (
 		>=mail-mta/postfix-2.4[dovecot-sasl,mysql,ssl=]
