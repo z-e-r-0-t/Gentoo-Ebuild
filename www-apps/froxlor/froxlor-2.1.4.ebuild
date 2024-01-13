@@ -282,12 +282,12 @@ pkg_postinst() {
 		elog "Froxlor is already installed on this system!"
 		elog
 		elog "Froxlor will update the database when you open"
-		elog "it in your browser the first time after the update-process"
+		elog "it in your browser the first time after the update-process."
 	else
 		if use apache2; then
-			elog "/etc/apache2/modules.d/00_default_settings.conf contains by default "
-			elog "\"<Directory />\\n  ...\\n  Require all denied\n</Directory>\" by default"
-			elog "Remove or comment out this line with \"#\" if u get 403 errors while accessing froxlor"
+			elog "/etc/apache2/modules.d/00_default_settings.conf contains by default:"
+			elog "	<Directory />\\n		...\\n		Require all denied\n	</Directory>\""
+			elog "If you get 403 errors while accessing Froxlor: remove line \"Require all denied\"."
 			elog ""
 			if ! use fpm && ! use fcgid ; then
 				elog "Don't forget to enable mod_php in /etc/conf.d/apache2 by adding \" -D PHP\" to APACHE2_OPTS var."
@@ -295,7 +295,7 @@ pkg_postinst() {
 			fi
 		fi
 		elog "Don't forget to setup your MySQL databases root user and password"
-		elog "using \"emerge --config mysql\" or \"emerge --config mariadb\""
+		elog "using \"emerge --config mysql\" or \"emerge --config mariadb\"."
 		elog
 		elog "Please open http://[ip]/froxlor in your browser to continue"
 		elog "with the basic setup of Froxlor."
