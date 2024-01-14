@@ -6,4 +6,4 @@ EAPI=8
 inherit acct-group
 
 DESCRIPTION="Group for Froxlor"
-ACCT_GROUP_ID=618
+ACCT_GROUP_ID=-1
