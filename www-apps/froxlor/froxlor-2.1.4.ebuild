@@ -275,6 +275,9 @@ src_install() {
 			ewarn "Unable to find existing apache default htdocs root. Please manually adjust your docroot if necessary."
 		fi
 
+		insinto /etc/apache2/modules.d/
+		newins ${FILESDIR}/apache_modules.d_00_default_settings.conf 00_default_settings.conf
+
 		if use fpm ; then
 			insinto /etc/apache2/modules.d/
 			newins ${FILESDIR}/apache_fpm_modules.d_70_mod_php.conf 70_mod_php.conf
@@ -301,10 +304,6 @@ pkg_postinst() {
 		elog "it in your browser the first time after the update-process."
 	else
 		if use apache2; then
-			elog "/etc/apache2/modules.d/00_default_settings.conf contains by default:"
-			elog "	<Directory />\\n		...\\n		Require all denied\n	</Directory>\""
-			elog "If you get 403 errors while accessing Froxlor: remove line \"Require all denied\"."
-			elog ""
 			if ! use fpm && ! use fcgid ; then
 				elog "Don't forget to enable mod_php in /etc/conf.d/apache2 by adding \" -D PHP\" to APACHE2_OPTS var."
 				elog
