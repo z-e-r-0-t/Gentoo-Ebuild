@@ -135,6 +135,11 @@ src_prepare() {
 	# Change all service reload commands from service to rc-service.
 	sed -e "s|service '|rc-service |g" -i "${S}/install/froxlor.sql.php" || die "Unable to change service reload commands."
 
+	sed -e "s|'vhost_httpuser', 'froxlorlocal'|'vhost_httpuser', 'froxlor'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change vhost_httpuser"
+	sed -e "s|'vhost_httpgroup', 'froxlorlocal'|'vhost_httpgroup', 'froxlor'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change vhost_httpgroup"
+	sed -e "s|'mod_fcgid_httpuser', 'froxlorlocal'|'mod_fcgid_httpuser', 'froxlor'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change mod_fcgid_httpuser"
+	sed -e "s|'mod_fcgid_httpgroup', 'froxlorlocal'|'mod_fcgid_httpgroup', 'froxlor'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change mod_fcgid_httpgroup"
+
 	# set correct webserver reload
 	if use lighttpd; then
 		einfo "Switching settings to fit 'lighttpd'"
@@ -258,10 +263,10 @@ src_install() {
 
 	fperms 0755 "${FROXLOR_DOCROOT}/bin/froxlor-cli"
 
-	# Ensure dir is writable by webserver
-	fowners -R froxlor:froxlor "${FROXLOR_DOCROOT}"
-
 	if use apache2; then
+		# Ensure dir is writable by apache
+		fowners -R apache:apache "${FROXLOR_DOCROOT}"
+
 		# Create symbolic link to froxlor docroot
 		if [[ -d "${APACHE_DEFAULT_DOCROOT}" ]]; then
 			FROXLOR_APACHE_LINK="${APACHE_DEFAULT_DOCROOT}froxlor"
@@ -269,10 +274,25 @@ src_install() {
 		else
 			ewarn "Unable to find existing apache default htdocs root. Please manually adjust your docroot if necessary."
 		fi
+
+		if use fpm ; then
+			insinto /etc/apache2/modules.d/
+			newins ${FILESDIR}/apache_fpm_modules.d_70_mod_php.conf 70_mod_php.conf
+
+			newconfd ${FILESDIR}/apache_fpm_conf.d_apache2 apache2
+
+			insinto /etc/php/fpm-$(eselect php show fpm)/fpm.d/
+			newins ${FILESDIR}/php_fpm_www.conf www.conf
+		fi
 	fi
 }
 
 pkg_postinst() {
+	if use fpm && use apache2; then
+		# we need this in order to apache being able to access fpm socket
+		usermod -a -G froxlor apache
+	fi
+
 	# we need to check if this is going to be an update or a fresh install!
 	if [[ -f "${ROOT}${FROXLOR_DOCROOT}/lib/userdata.inc.php" ]] ; then
 		elog "Froxlor is already installed on this system!"
@@ -292,6 +312,10 @@ pkg_postinst() {
 		fi
 		elog "Don't forget to setup your MySQL databases root user and password"
 		elog "using \"emerge --config mysql\" or \"emerge --config mariadb\"."
+		elog
+		elog "Don't forget to apply possible config changes, e.g. using \"dispatch-conf\""
+		elog
+		elog "Don't forget to restart services after config change, e.g. \"/etc/init.d/... restart\""
 		elog
 		elog "Please open http://[ip]/froxlor in your browser to continue"
 		elog "with the basic setup of Froxlor."
