@@ -87,7 +87,9 @@ DEPEND="
 	)
 	quota? (
 		sys-fs/quotatool
-	)"
+	)
+	acct-user/froxlor
+	acct-group/froxlor"
 
 RDEPEND="${DEPEND}"
 
@@ -256,10 +258,10 @@ src_install() {
 
 	fperms 0755 "${FROXLOR_DOCROOT}/bin/froxlor-cli"
 
-	if use apache2; then
-		# Ensure dir is writable by apache
-		fowners -R apache:apache "${FROXLOR_DOCROOT}"
+	# Ensure dir is writable by webserver
+	fowners -R froxlor:froxlor "${FROXLOR_DOCROOT}"
 
+	if use apache2; then
 		# Create symbolic link to froxlor docroot
 		if [[ -d "${APACHE_DEFAULT_DOCROOT}" ]]; then
 			FROXLOR_APACHE_LINK="${APACHE_DEFAULT_DOCROOT}froxlor"
