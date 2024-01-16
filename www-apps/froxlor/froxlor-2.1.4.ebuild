@@ -77,6 +77,8 @@ DEPEND="
 		)
 	)
 	dovecot? (
+		acct-user/vmail
+		acct-group/vmail
 		>=net-mail/dovecot-2.2.0[argon2,managesieve,mysql,sieve]
 	)
 	postfix? (
