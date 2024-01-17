@@ -79,7 +79,7 @@ DEPEND="
 	dovecot? (
 		acct-user/vmail
 		acct-group/vmail
-		>=net-mail/dovecot-2.2.0[argon2,managesieve,mysql,sieve]
+		>=net-mail/dovecot-2.2.0[argon2,mysql]
 	)
 	postfix? (
 		>=mail-mta/postfix-2.4[dovecot-sasl,mysql,ssl=]
