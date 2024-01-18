@@ -257,6 +257,16 @@ src_prepare() {
 		einfo "Switching from 'ProFTPd' to 'Pure-FTPd'"
 		sed -e "s|'ftpserver', 'proftpd'|'ftpserver', 'pureftpd'|g" -i "${S}/install/froxlor.sql.php"
 	fi
+
+	if use dovecot || use postfix; then
+		VMAIL_UID=$(id -u vmail)
+		einfo "Setting system.vmail_uid to ${VMAIL_UID}"
+		sed -e "s|'system', 'vmail_uid', '2000'|'system', 'vmail_uid', '${VMAIL_UID}'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set system.vmail_uid"
+
+		VMAIL_GID=$(id -u vmail)
+		einfo "Setting system.vmail_gid to ${VMAIL_GID}"
+		sed -e "s|'system', 'vmail_gid', '2000'|'system', 'vmail_gid', '${VMAIL_GID}'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set system.vmail_gid"
+	fi
 }
 
 src_install() {
