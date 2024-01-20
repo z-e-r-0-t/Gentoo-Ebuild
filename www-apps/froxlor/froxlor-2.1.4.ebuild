@@ -19,7 +19,7 @@ HOMEPAGE="https://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="+apache2 awstats bind +dovecot fcgid +fpm +goaccess lighttpd +log mailquota nginx pdns +postfix +proftpd pureftpd quota ssl webalizer vsftpd"
+IUSE="+apache2 awstats bind +dovecot fcgid +fpm +goaccess lighttpd +log mailquota nginx pdns +postfix +proftpd pureftpd quota +ssl webalizer vsftpd"
 
 DEPEND="
 	virtual/mysql
@@ -28,6 +28,9 @@ DEPEND="
 	>=sys-auth/libnss-extrausers-0.6
 	pureftpd? (
 		net-ftp/pure-ftpd[mysql,ssl=]
+		quota? (
+			net-ftp/pure-ftpd[sysquota]
+		)
 	)
 	proftpd? (
 		net-ftp/proftpd[mysql,ssl=]
@@ -108,7 +111,8 @@ REQUIRED_USE="
 	)
 	fcgid? ( !fpm )
 	pdns? ( !bind )
-	postfix? ( dovecot )"
+	postfix? ( dovecot )
+	quota? ( !vsftpd )"
 
 # lets check user defined variables
 FROXLOR_DOCROOT="${FROXLOR_DOCROOT:-/var/www/froxlor/}"
@@ -225,6 +229,17 @@ src_prepare() {
 		sed -e "s|'mail_quota_enabled', '0'|'mail_quota_enabled', '1'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set mailquota to 'On'"
 	fi
 
+	if use quota ; then
+		einfo "Switching 'system_diskquota_enabled' to 'On'"
+		sed -e "s|'system', 'diskquota_enabled', '0'|'system', 'diskquota_enabled', '1'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set diskquota_enabled to 'On'"
+
+		DQ_C_PART=$(df /var/ | tail -n 1 | cut -d ' ' -f1)
+		sed -e "s|'system', 'diskquota_customer_partition', '/dev/root'|'system', 'diskquota_customer_partition', '${DQ_C_PART}'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set diskquota_customer_partition"
+
+		sed -e "s|'system', 'diskquota_quotatool_path', '/usr/bin/quotatool'|'system', 'diskquota_quotatool_path', '/usr/sbin/quotatool'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set diskquota_quotatool_path"
+
+	fi
+
 	# default value is ssl_enabled='1'
 	if ! use ssl ; then
 		einfo "Switching 'SSL' to 'Off'"
@@ -308,6 +323,13 @@ pkg_postinst() {
 	if use fpm && use apache2; then
 		# we need this in order to apache being able to access fpm socket
 		usermod -a -G froxlor apache
+	fi
+
+	if use quota; then
+		elog "You enabled quota support"
+		elog "Remember to setup quota support for Gentoo manually (Kernel + Filesystem)"
+		elog "More Info: https://wiki.gentoo.org/wiki/Disk_quotas"
+		elog ""
 	fi
 
 	# we need to check if this is going to be an update or a fresh install!
