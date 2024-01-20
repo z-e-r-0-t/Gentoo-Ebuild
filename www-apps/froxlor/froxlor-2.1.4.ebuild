@@ -19,13 +19,14 @@ HOMEPAGE="https://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="+apache2 awstats bind +dovecot fcgid +fpm +goaccess lighttpd +log mailquota nginx pdns +postfix +proftpd pureftpd quota +ssl webalizer vsftpd"
+IUSE="+apache2 awstats bind +dovecot fcgid +fpm +goaccess lighttpd mailquota nginx pdns +postfix +proftpd pureftpd quota +ssl webalizer vsftpd"
 
 DEPEND="
-	virtual/mysql
-	virtual/cron
+	app-admin/logrotate
 	>=dev-lang/php-7.4:*[bcmath,cli,ctype,curl,filter,gd,gmp,mysql,pdo,posix,session,xml,zip]
 	>=sys-auth/libnss-extrausers-0.6
+	virtual/cron
+	virtual/mysql
 	pureftpd? (
 		net-ftp/pure-ftpd[mysql,ssl=]
 		quota? (
@@ -85,10 +86,7 @@ DEPEND="
 		>=net-mail/dovecot-2.2.0[argon2,mysql]
 	)
 	postfix? (
-		>=mail-mta/postfix-2.4[dovecot-sasl,mysql,ssl=]
-	)
-	log? (
-		app-admin/logrotate
+		>=mail-mta/postfix-3.8[dovecot-sasl,mysql,ssl=]
 	)
 	quota? (
 		sys-fs/quotatool
@@ -215,12 +213,6 @@ src_prepare() {
 		ewarn "Note that you need to configure pdns and create a separate database for it, see:"
 		ewarn "https://doc.powerdns.com/3/authoritative/installation/#basic-setup-configuring-database-connectivity"
 		ewarn ""
-	fi
-
-	# default value is logging_enabled='1'
-	if ! use log ; then
-		einfo "Switching 'log' to 'Off'"
-		sed -e "s|'logger', 'enabled', '1'|'logger', 'enabled', '0'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set logging to 'Off'"
 	fi
 
 	# default value is mailquota='0'
