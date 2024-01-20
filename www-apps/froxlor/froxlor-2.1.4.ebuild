@@ -227,9 +227,7 @@ src_prepare() {
 
 		DQ_C_PART=$(df /var/ | tail -n 1 | cut -d ' ' -f1)
 		sed -e "s|'system', 'diskquota_customer_partition', '/dev/root'|'system', 'diskquota_customer_partition', '${DQ_C_PART}'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set diskquota_customer_partition"
-
 		sed -e "s|'system', 'diskquota_quotatool_path', '/usr/bin/quotatool'|'system', 'diskquota_quotatool_path', '/usr/sbin/quotatool'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set diskquota_quotatool_path"
-
 	fi
 
 	# default value is ssl_enabled='1'
@@ -240,7 +238,7 @@ src_prepare() {
 
 	if use awstats ; then
 		einfo "Enable awstats"
-		sed -e "s|'webalizer_quiet', '2'|'webalizer_quiet', '0'|g" -i "${S}/install/froxlor.sql.php"
+		sed -e "s|'system', 'awstats_icons', '/usr/share/awstats/icon/'|'system', 'awstats_icons', '/usr/share/awstats/wwwroot/icon/'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set awstats_icons"
 		"${FILESDIR}/updateConfig.py" lib/configfiles/gentoo.xml \
 			"./distribution/defaults/default[@settinggroup='system'][@varname='traffictool']" value awstats \
 			|| die "Unable to enable awstats"
@@ -255,6 +253,7 @@ src_prepare() {
 
 	if use webalizer ; then
 		einfo "Enable webalizer"
+		sed -e "s|'webalizer_quiet', '2'|'webalizer_quiet', '0'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set webalizer_quiet"
 		"${FILESDIR}/updateConfig.py" lib/configfiles/gentoo.xml \
 			"./distribution/defaults/default[@settinggroup='system'][@varname='traffictool']" value webalizer \
 			|| die "Unable to enable webalizer"
