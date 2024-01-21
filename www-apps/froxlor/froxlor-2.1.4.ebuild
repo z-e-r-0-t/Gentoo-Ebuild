@@ -65,6 +65,9 @@ DEPEND="
 			www-servers/apache[suexec]
 			acct-user/froxlor[min_uid_1000]
 		)
+		nginx? (
+			www-servers/nginx[nginx_modules_http_fastcgi]
+		)
 	)
 	fpm? (
 		dev-lang/php:*[fpm]
@@ -100,13 +103,19 @@ REQUIRED_USE="
 		webalizer
 	)
 	fcgid? ( !fpm )
+	nginx? (
+		^^ (
+			fcgid
+			fpm
+		)
+	)
 	pdns? ( !bind )
 	postfix? ( dovecot )
 	proftpd? ( !pureftpd )"
 
 # lets check user defined variables
 FROXLOR_DOCROOT="${FROXLOR_DOCROOT:-/var/www/froxlor/}"
-APACHE_DEFAULT_DOCROOT="${APACHE_DEFAULT_DOCROOT:-/var/www/localhost/htdocs/}"
+WWW_DEFAULT_DOCROOT="${WWW_DEFAULT_DOCROOT:-/var/www/localhost/htdocs/}"
 
 S="${WORKDIR}/${PN}"
 
@@ -271,17 +280,17 @@ src_install() {
 
 	fperms 0755 "${FROXLOR_DOCROOT}/bin/froxlor-cli"
 
+	# Create symbolic link to froxlor docroot
+	if [[ -d "${WWW_DEFAULT_DOCROOT}" ]]; then
+		FROXLOR_APACHE_LINK="${WWW_DEFAULT_DOCROOT}froxlor"
+		dosym -r "${ROOT}${FROXLOR_DOCROOT}" "${FROXLOR_APACHE_LINK}"
+	else
+		ewarn "Unable to find existing www default htdocs root. Please manually adjust your docroot if necessary."
+	fi
+
 	if use apache2; then
 		# Ensure dir is writable by apache
 		fowners -R apache:apache "${FROXLOR_DOCROOT}"
-
-		# Create symbolic link to froxlor docroot
-		if [[ -d "${APACHE_DEFAULT_DOCROOT}" ]]; then
-			FROXLOR_APACHE_LINK="${APACHE_DEFAULT_DOCROOT}froxlor"
-			dosym -r "${ROOT}${FROXLOR_DOCROOT}" "${FROXLOR_APACHE_LINK}"
-		else
-			ewarn "Unable to find existing apache default htdocs root. Please manually adjust your docroot if necessary."
-		fi
 
 		insinto /etc/apache2/modules.d/
 		newins ${FILESDIR}/apache_modules.d_00_default_settings.conf 00_default_settings.conf
@@ -293,7 +302,7 @@ src_install() {
 			newconfd ${FILESDIR}/apache_fpm_conf.d_apache2 apache2
 
 			insinto /etc/php/fpm-$(eselect php show fpm)/fpm.d/
-			newins ${FILESDIR}/php_fpm_www.conf www.conf
+			newins ${FILESDIR}/php_fpm_www_apache.conf www.conf
 		elif use fcgid; then
 			insinto /etc/apache2/modules.d/
 			newins ${FILESDIR}/apache_fcgid_modules.d_20_mod_fcgid.conf 20_mod_fcgid.conf
@@ -304,6 +313,16 @@ src_install() {
 		else
 			# mod_php
 			newconfd ${FILESDIR}/apache_mod_php_conf.d_apache2 apache2
+		fi
+	elif use nginx; then
+		# Ensure dir is writable by nginx
+		fowners -R nginx:nginx "${FROXLOR_DOCROOT}"
+		if use fpm ; then
+			insinto /etc/nginx/
+			newins ${FILESDIR}/nginx_nginx.conf nginx.conf
+
+			insinto /etc/php/fpm-$(eselect php show fpm)/fpm.d/
+			newins ${FILESDIR}/php_fpm_www_nginx.conf www.conf
 		fi
 	fi
 }
