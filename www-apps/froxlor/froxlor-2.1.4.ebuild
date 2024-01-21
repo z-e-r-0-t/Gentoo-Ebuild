@@ -19,7 +19,7 @@ HOMEPAGE="https://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="+apache2 awstats bind +dovecot fcgid +fpm +goaccess lighttpd mailquota nginx pdns +postfix +proftpd pureftpd quota +ssl webalizer vsftpd"
+IUSE="+apache2 awstats bind +dovecot fcgid +fpm +goaccess lighttpd mailquota nginx pdns +postfix +proftpd pureftpd quota +ssl webalizer"
 
 DEPEND="
 	app-admin/logrotate
@@ -38,10 +38,6 @@ DEPEND="
 		quota? (
 			net-ftp/proftpd[softquota]
 		)
-	)
-	vsftpd? (
-		net-ftp/vsftpd[pam]
-		sys-auth/pam_mysql
 	)
 	goaccess? (
 		net-analyzer/goaccess
@@ -110,7 +106,7 @@ REQUIRED_USE="
 	fcgid? ( !fpm )
 	pdns? ( !bind )
 	postfix? ( dovecot )
-	quota? ( !vsftpd )"
+	proftpd? ( !pureftpd )"
 
 # lets check user defined variables
 FROXLOR_DOCROOT="${FROXLOR_DOCROOT:-/var/www/froxlor/}"
