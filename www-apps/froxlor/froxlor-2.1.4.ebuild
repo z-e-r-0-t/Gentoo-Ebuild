@@ -61,7 +61,9 @@ DEPEND="
 	fcgid? (
 		dev-lang/php:*[cgi]
 		apache2? (
-			www-servers/apache[suexec,apache2_modules_proxy,apache2_modules_proxy_fcgi]
+			www-apache/mod_fcgid
+			www-servers/apache[suexec]
+			acct-user/froxlor[min_uid_1000]
 		)
 	)
 	fpm? (
@@ -174,11 +176,9 @@ src_prepare() {
 	if use fpm ; then
 		einfo "Switching 'fpm' to 'On'"
 		sed -e "s|'phpfpm', 'enabled', '0'|'phpfpm', 'enabled', '1'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set fpm to 'On'"
-
-		# Hw to get version of required/installed php package?
-		# einfo "Setting configdir for fpm"
-		# sed -e "s|'phpfpm', 'configdir', '/etc/php-fpm.d/'|'phpfpm', 'configdir', '/etc/php/fpm-php5.3/fpm.d/'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set configdir for 'fpm'"
-
+	elif use fcgid; then
+		einfo "Switching 'fcgid' to 'On'"
+		sed -e "s|'system', 'mod_fcgid', '0'|'system', 'mod_fcgid', '1'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set mod_fcgid"
 	fi
 
 	# If Bind and pdns will not be used disable nameserver.
@@ -278,7 +278,7 @@ src_install() {
 		# Create symbolic link to froxlor docroot
 		if [[ -d "${APACHE_DEFAULT_DOCROOT}" ]]; then
 			FROXLOR_APACHE_LINK="${APACHE_DEFAULT_DOCROOT}froxlor"
-			dosym -r "${ROOT}${FROXLOR_DOCROOT}" "${FROXLOR_APACHE_LINK}" || ewarn "Unable to create symlink in htdocs root. Please manually adjust your docroot if necessary."
+			dosym -r "${ROOT}${FROXLOR_DOCROOT}" "${FROXLOR_APACHE_LINK}"
 		else
 			ewarn "Unable to find existing apache default htdocs root. Please manually adjust your docroot if necessary."
 		fi
@@ -294,7 +294,15 @@ src_install() {
 
 			insinto /etc/php/fpm-$(eselect php show fpm)/fpm.d/
 			newins ${FILESDIR}/php_fpm_www.conf www.conf
-		elif ! use fpm && ! use fcgid ; then
+		elif use fcgid; then
+			insinto /etc/apache2/modules.d/
+			newins ${FILESDIR}/apache_fcgid_modules.d_20_mod_fcgid.conf 20_mod_fcgid.conf
+
+			newconfd ${FILESDIR}/apache_fcgid_conf.d_apache2 apache2
+
+			dosym /usr/bin/php-cgi /var/www/localhost/htdocs/fcgid-bin/php-fcgid-wrapper
+		else
+			# mod_php
 			newconfd ${FILESDIR}/apache_mod_php_conf.d_apache2 apache2
 		fi
 	fi
