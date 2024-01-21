@@ -29,15 +29,9 @@ DEPEND="
 	virtual/mysql
 	pureftpd? (
 		net-ftp/pure-ftpd[mysql,ssl=]
-		quota? (
-			net-ftp/pure-ftpd[sysquota]
-		)
 	)
 	proftpd? (
-		net-ftp/proftpd[mysql,ssl=]
-		quota? (
-			net-ftp/proftpd[softquota]
-		)
+		net-ftp/proftpd[mysql,softquota,ssl=]
 	)
 	goaccess? (
 		net-analyzer/goaccess
