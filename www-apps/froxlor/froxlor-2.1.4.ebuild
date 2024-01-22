@@ -56,7 +56,7 @@ DEPEND="
 	)
 	lighttpd? ( www-servers/lighttpd[php,ssl=] )
 	nginx? (
-		www-servers/nginx:*[ssl=]
+		www-servers/nginx:*[http2,ssl=]
 	)
 	fcgid? (
 		dev-lang/php:*[cgi]
@@ -65,14 +65,14 @@ DEPEND="
 			www-servers/apache[suexec]
 			acct-user/froxlor[min_uid_1000]
 		)
-		nginx? (
-			www-servers/nginx[nginx_modules_http_fastcgi]
-		)
 	)
 	fpm? (
 		dev-lang/php:*[fpm]
 		apache2? (
 			www-servers/apache[suexec,apache2_modules_proxy,apache2_modules_proxy_fcgi]
+		)
+		nginx? (
+			www-servers/nginx[nginx_modules_http_auth_basic,nginx_modules_http_fastcgi,nginx_modules_http_rewrite]
 		)
 	)
 	dovecot? (
@@ -104,10 +104,7 @@ REQUIRED_USE="
 	)
 	fcgid? ( !fpm )
 	nginx? (
-		^^ (
-			fcgid
-			fpm
-		)
+		fpm
 	)
 	pdns? ( !bind )
 	postfix? ( dovecot )
