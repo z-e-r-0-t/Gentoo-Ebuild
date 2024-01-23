@@ -132,79 +132,79 @@ src_prepare() {
 	default
 
 	einfo "Setting 'lastguid' to '10000'"
-	sed -e "s|'lastguid', '9999'|'lastguid', '10000'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change lastguid"
+	patch_default_sql "system" "lastguid" "10000"
 
-	# Change all service reload commands from service to rc-service.
-	sed -e "s|service '|rc-service |g" -i "${S}/install/froxlor.sql.php" || die "Unable to change service reload commands."
-
-	sed -e "s|'vhost_httpuser', 'froxlorlocal'|'vhost_httpuser', 'froxlor'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change vhost_httpuser"
-	sed -e "s|'vhost_httpgroup', 'froxlorlocal'|'vhost_httpgroup', 'froxlor'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change vhost_httpgroup"
-	sed -e "s|'mod_fcgid_httpuser', 'froxlorlocal'|'mod_fcgid_httpuser', 'froxlor'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change mod_fcgid_httpuser"
-	sed -e "s|'mod_fcgid_httpgroup', 'froxlorlocal'|'mod_fcgid_httpgroup', 'froxlor'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change mod_fcgid_httpgroup"
+	einfo "Updating httpuser"
+	patch_default_sql "phpfpm" "vhost_httpuser" "froxlor"
+	patch_default_sql "phpfpm" "vhost_httpgroup" "froxlor"
+	patch_default_sql "system" "mod_fcgid_httpuser" "froxlor"
+	patch_default_sql "system" "mod_fcgid_httpgroup" "froxlor"
 
 	# set correct webserver reload
 	if use lighttpd; then
 		einfo "Switching settings to fit 'lighttpd'"
-		sed -e "s|/etc/init.d/apache2 reload|/etc/init.d/lighttpd restart|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver restart-command"
-		sed -e "s|'webserver', 'apache2'|'webserver', 'lighttpd'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver version"
-		sed -e "s|'apacheconf_vhost', '/etc/apache2/sites-enabled/'|'apacheconf_vhost', '/etc/lighttpd/vj/'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver vhost directory"
-		sed -e "s|'apacheconf_diroptions', '/etc/apache2/sites-enabled/'|'apacheconf_diroptions', '/etc/lighttpd/diroptions.conf'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver diroptions file"
-		sed -e "s|'apacheconf_htpasswddir', '/etc/apache2/htpasswd/'|'apacheconf_htpasswddir', '/etc/lighttpd/htpasswd/'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver htpasswd directory"
-		sed -e "s|'httpuser', 'www-data'|'httpuser', 'lighttpd'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver user"
-		sed -e "s|'httpgroup', 'www-data'|'httpgroup', 'lighttpd'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver group"
-		sed -e "s|'fastcgi_ipcdir', '/var/lib/apache2/fastcgi/'|'fastcgi_ipcdir', '/var/run/lighttpd/'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change php-ipc directory"
+		patch_default_sql "system" "apachereload_command" "/etc/init.d/lighttpd restart"
+		patch_default_sql "system" "webserver" "lighttpd"
+		patch_default_sql "system" "apacheconf_vhost" "/etc/lighttpd/vj/"
+		patch_default_sql "system" "apacheconf_diroptions" "/etc/lighttpd/diroptions.conf"
+		patch_default_sql "system" "apacheconf_htpasswddir" "/etc/lighttpd/htpasswd/"
+		patch_default_sql "system" "httpuser" "lighttpd"
+		patch_default_sql "system" "httpgroup" "lighttpd"
+		patch_default_sql "phpfpm" "fastcgi_ipcdir" "/var/run/lighttpd/"
 	elif use nginx; then
 		einfo "Switching settings to fit 'nginx'"
-		sed -e "s|/etc/init.d/apache2 reload|/etc/init.d/nginx restart|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver restart-command"
-		sed -e "s|'webserver', 'apache2'|'webserver', 'nginx'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver version"
-		sed -e "s|'apacheconf_vhost', '/etc/apache2/sites-enabled/'|'apacheconf_vhost', '/etc/nginx/vhosts.d/'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver vhost directory"
-		sed -e "s|'apacheconf_diroptions', '/etc/apache2/sites-enabled/'|'apacheconf_diroptions', '/etc/nginx/diroptions.conf'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver diroptions file"
-		sed -e "s|'apacheconf_htpasswddir', '/etc/apache2/htpasswd/'|'apacheconf_htpasswddir', '/etc/nginx/htpasswd/'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver htpasswd directory"
-		sed -e "s|'httpuser', 'www-data'|'httpuser', 'nginx'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver user"
-		sed -e "s|'httpgroup', 'www-data'|'httpgroup', 'nginx'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver group"
-		sed -e "s|'fastcgi_ipcdir', '/var/lib/apache2/fastcgi/'|'fastcgi_ipcdir', '/var/run/nginx/'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change php-ipc directory"
+		patch_default_sql "system" "apachereload_command" "/etc/init.d/nginx restart"
+		patch_default_sql "system" "webserver" "nginx"
+		patch_default_sql "system" "apacheconf_vhost" "/etc/nginx/vhosts.d/"
+		patch_default_sql "system" "apacheconf_diroptions" "/etc/nginx/diroptions.conf"
+		patch_default_sql "system" "apacheconf_htpasswddir" "/etc/nginx/htpasswd/"
+		patch_default_sql "system" "httpuser" "nginx"
+		patch_default_sql "system" "httpgroup" "nginx"
+		patch_default_sql "phpfpm" "fastcgi_ipcdir" "/var/run/nginx/"
 	else
 		einfo "Switching settings to fit 'apache2'"
-		sed -e "s|'apacheconf_vhost', '/etc/apache2/sites-enabled/'|'apacheconf_vhost', '/etc/apache2/vhosts.d/'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver vhost directory"
-		sed -e "s|'apacheconf_diroptions', '/etc/apache2/sites-enabled/'|'apacheconf_diroptions', '/etc/apache2/vhosts.d/'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver diroptions file"
-		sed -e "s|'httpuser', 'www-data'|'httpuser', 'apache'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver user"
-		sed -e "s|'httpgroup', 'www-data'|'httpgroup', 'apache'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change webserver group"
+		patch_default_sql "system" "apacheconf_vhost" "/etc/apache2/vhosts.d/"
+		patch_default_sql "system" "apacheconf_diroptions" "/etc/apache2/vhosts.d/"
+		patch_default_sql "system" "httpuser" "apache"
+		patch_default_sql "system" "httpgroup" "apache"
 	fi
 
 	if use fcgid && ! use lighttpd && ! use nginx ; then
 		einfo "Switching 'fcgid' to 'On'"
-		sed -e "s|'mod_fcgid', '0'|'mod_fcgid', '1'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set fcgid to 'On'"
+		patch_default_sql "system" "mod_fcgid" "1"
 
 		einfo "Setting wrapper to FcgidWrapper"
-		sed -e "s|'mod_fcgid_wrapper', '0'|'mod_fcgid_wrapper', '1'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set fcgi-wrapper to 'FCGIWrapper'"
+		patch_default_sql "system" "mod_fcgid_wrapper" "1"
 	fi
 
 	if use fpm ; then
 		einfo "Switching 'fpm' to 'On'"
-		sed -e "s|'phpfpm', 'enabled', '0'|'phpfpm', 'enabled', '1'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set fpm to 'On'"
+		patch_default_sql "phpfpm" "enabled" "1"
 	elif use fcgid; then
 		einfo "Switching 'fcgid' to 'On'"
-		sed -e "s|'system', 'mod_fcgid', '0'|'system', 'mod_fcgid', '1'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set mod_fcgid"
+		patch_default_sql "system" "mod_fcgid" "1"
 	fi
 
 	# If Bind and pdns will not be used disable nameserver.
 	if ! use bind && ! use pdns; then
 		einfo "Disabling nameserver"
-		sed -e "s|'bind_enable', '1'|'bind_enable', '0'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change binds enabled flag"
-		sed -e "s|/etc/init.d/bind9 reload|/bin/true|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change reload path for Bind"
+		patch_default_sql "system" "bind_enable" "0"
+		patch_default_sql "system" "bindreload_command" "/bin/true"
 	fi
 
 	if use bind ; then
 		einfo "Setting bind9 reload command"
-		sed -e "s|'bind_enable', '0'|'bind_enable', '1'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change binds enabled flag"
-		sed -e "s|/etc/init.d/bind9 reload|/etc/init.d/named reload|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change reload path for Bind"
+		patch_default_sql "system" "bind_enable" "1"
+		patch_default_sql "system" "bindreload_command" "/etc/init.d/named reload"
 	fi
 
 	if use pdns ; then
 		einfo "Switching from 'bind' to 'powerdns'"
-		sed -e "s|'bind_enable', '0'|'bind_enable', '1'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change binds enabled flag"
-		sed -e "s|/etc/init.d/bind9 reload|/etc/init.d/pdns restart|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change reload path for pdns"
-		sed -e "s|'dns_server', 'bind'|'dns_server', 'pdns'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change dns-server value from bind to pdns"
+		patch_default_sql "system" "bind_enable" "1"
+		patch_default_sql "system" "bindconf_directory" "/etc/powerdns/"
+		patch_default_sql "system" "bindreload_command" "/etc/init.d/pdns restart"
+		patch_default_sql "system" "dns_server" "PowerDNS"
+
 		ewarn ""
 		ewarn "Note that you need to configure pdns and create a separate database for it, see:"
 		ewarn "https://doc.powerdns.com/3/authoritative/installation/#basic-setup-configuring-database-connectivity"
@@ -214,27 +214,26 @@ src_prepare() {
 	# default value is mailquota='0'
 	if use mailquota ; then
 		einfo "Switching 'mailquota' to 'On'"
-		sed -e "s|'mail_quota_enabled', '0'|'mail_quota_enabled', '1'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set mailquota to 'On'"
+		patch_default_sql "system" "mail_quota_enabled" "1"
 	fi
 
 	if use quota ; then
 		einfo "Switching 'system_diskquota_enabled' to 'On'"
-		sed -e "s|'system', 'diskquota_enabled', '0'|'system', 'diskquota_enabled', '1'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set diskquota_enabled to 'On'"
-
+		patch_default_sql "system" "diskquota_enabled" "1"
 		DQ_C_PART=$(df /var/ | tail -n 1 | cut -d ' ' -f1)
-		sed -e "s|'system', 'diskquota_customer_partition', '/dev/root'|'system', 'diskquota_customer_partition', '${DQ_C_PART}'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set diskquota_customer_partition"
-		sed -e "s|'system', 'diskquota_quotatool_path', '/usr/bin/quotatool'|'system', 'diskquota_quotatool_path', '/usr/sbin/quotatool'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set diskquota_quotatool_path"
+		patch_default_sql "system" "diskquota_customer_partition" "${DQ_C_PART}"
+		patch_default_sql "system" "diskquota_quotatool_path" "/usr/sbin/quotatool"
 	fi
 
 	# default value is ssl_enabled='1'
 	if ! use ssl ; then
 		einfo "Switching 'SSL' to 'Off'"
-		sed -e "s|'use_ssl','1'|'use_ssl','0'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set ssl to 'Off'"
+		patch_default_sql "system" "use_ssl" "0"
 	fi
 
 	if use awstats ; then
 		einfo "Enable awstats"
-		sed -e "s|'system', 'awstats_icons', '/usr/share/awstats/icon/'|'system', 'awstats_icons', '/usr/share/awstats/wwwroot/icon/'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set awstats_icons"
+		patch_default_sql "system" "awstats_icons" "/usr/share/awstats/wwwroot/icon/"
 		"${FILESDIR}/updateConfig.py" lib/configfiles/gentoo.xml \
 			"./distribution/defaults/default[@settinggroup='system'][@varname='traffictool']" value awstats \
 			|| die "Unable to enable awstats"
@@ -249,7 +248,7 @@ src_prepare() {
 
 	if use webalizer ; then
 		einfo "Enable webalizer"
-		sed -e "s|'webalizer_quiet', '2'|'webalizer_quiet', '0'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set webalizer_quiet"
+		patch_default_sql "system" "webalizer_quiet" "0"
 		"${FILESDIR}/updateConfig.py" lib/configfiles/gentoo.xml \
 			"./distribution/defaults/default[@settinggroup='system'][@varname='traffictool']" value webalizer \
 			|| die "Unable to enable webalizer"
@@ -257,17 +256,17 @@ src_prepare() {
 
 	if use pureftpd ; then
 		einfo "Switching from 'ProFTPd' to 'Pure-FTPd'"
-		sed -e "s|'ftpserver', 'proftpd'|'ftpserver', 'pureftpd'|g" -i "${S}/install/froxlor.sql.php"
+		patch_default_sql "system" "ftpserver" "pureftpd"
 	fi
 
 	if use dovecot || use postfix; then
 		VMAIL_UID=$(id -u vmail)
 		einfo "Setting system.vmail_uid to ${VMAIL_UID}"
-		sed -e "s|'system', 'vmail_uid', '2000'|'system', 'vmail_uid', '${VMAIL_UID}'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set system.vmail_uid"
+		patch_default_sql "system" "vmail_uid" "${VMAIL_UID}"
 
 		VMAIL_GID=$(id -u vmail)
 		einfo "Setting system.vmail_gid to ${VMAIL_GID}"
-		sed -e "s|'system', 'vmail_gid', '2000'|'system', 'vmail_gid', '${VMAIL_GID}'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to set system.vmail_gid"
+		patch_default_sql "system" "vmail_gid" "${VMAIL_GID}"
 	fi
 }
 
@@ -354,4 +353,16 @@ pkg_postinst() {
 		elog "Please open http://[ip]/froxlor in your browser to continue"
 		elog "with the basic setup of Froxlor."
 	fi
+}
+
+patch_default_sql() {
+	KEY="'$1', '$2', "
+	KEY_PRETTY="$1.$2"
+	NEW_VALUE="$3"
+	SQL_FILE="${S}/install/froxlor.sql.php"
+	OLD_VALUE="'[^']*'"
+	SEARCH="(\(${KEY})${OLD_VALUE}(\),?)\$"
+
+	grep -E "${SEARCH}" "${SQL_FILE}" &>/dev/null || die "Unable to find key: ${KEY_PRETTY}"
+	sed -E -e "s|${SEARCH}|\1'${NEW_VALUE}'\2|g" -i "${SQL_FILE}" || die "Unable to patch key: ${KEY_PRETTY}"
 }
