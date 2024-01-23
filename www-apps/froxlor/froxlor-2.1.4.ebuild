@@ -190,21 +190,21 @@ src_prepare() {
 	# If Bind and pdns will not be used disable nameserver.
 	if ! use bind && ! use pdns; then
 		einfo "Disabling nameserver"
-		sed -e 's|'bind_enable', '1'|'bind_enable', '0'|g' -i "${S}/install/froxlor.sql.php" || die "Unable to change binds enabled flag"
-		sed -e 's|/etc/init.d/bind9 reload|/bin/true|g' -i "${S}/install/froxlor.sql.php" || die "Unable to change reload path for Bind"
+		sed -e "s|'bind_enable', '1'|'bind_enable', '0'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change binds enabled flag"
+		sed -e "s|/etc/init.d/bind9 reload|/bin/true|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change reload path for Bind"
 	fi
 
 	if use bind ; then
 		einfo "Setting bind9 reload command"
-		sed -e 's|'bind_enable', '0'|'bind_enable', '1'|g' -i "${S}/install/froxlor.sql.php" || die "Unable to change binds enabled flag"
-		sed -e 's|/etc/init.d/bind9 reload|/etc/init.d/named reload|g' -i "${S}/install/froxlor.sql.php" || die "Unable to change reload path for Bind"
+		sed -e "s|'bind_enable', '0'|'bind_enable', '1'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change binds enabled flag"
+		sed -e "s|/etc/init.d/bind9 reload|/etc/init.d/named reload|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change reload path for Bind"
 	fi
 
 	if use pdns ; then
 		einfo "Switching from 'bind' to 'powerdns'"
-		sed -e 's|'bind_enable', '0'|'bind_enable', '1'|g' -i "${S}/install/froxlor.sql.php" || die "Unable to change binds enabled flag"
-		sed -e 's|/etc/init.d/bind9 reload|/etc/init.d/pdns restart|g' -i "${S}/install/froxlor.sql.php" || die "Unable to change reload path for pdns"
-		sed -e 's|'dns_server', 'bind'|'dns_server', 'pdns'|g' -i "${S}/install/froxlor.sql.php" || die "Unable to change dns-server value from bind to pdns"
+		sed -e "s|'bind_enable', '0'|'bind_enable', '1'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change binds enabled flag"
+		sed -e "s|/etc/init.d/bind9 reload|/etc/init.d/pdns restart|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change reload path for pdns"
+		sed -e "s|'dns_server', 'bind'|'dns_server', 'pdns'|g" -i "${S}/install/froxlor.sql.php" || die "Unable to change dns-server value from bind to pdns"
 		ewarn ""
 		ewarn "Note that you need to configure pdns and create a separate database for it, see:"
 		ewarn "https://doc.powerdns.com/3/authoritative/installation/#basic-setup-configuring-database-connectivity"
