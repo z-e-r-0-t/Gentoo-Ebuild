@@ -23,6 +23,7 @@ IUSE="+apache2 awstats bind +dovecot fcgid +fpm +goaccess lighttpd mailquota ngi
 
 DEPEND="
 	app-admin/logrotate
+	app-crypt/gnupg
 	>=dev-lang/php-7.4:*[bcmath,cli,ctype,curl,filter,gd,gmp,mysql,pdo,posix,session,xml,zip]
 	>=sys-auth/libnss-extrausers-0.6
 	virtual/cron
