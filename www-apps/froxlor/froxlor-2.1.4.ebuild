@@ -223,6 +223,12 @@ src_prepare() {
 		DQ_C_PART=$(df /var/ | tail -n 1 | cut -d ' ' -f1)
 		patch_default_sql "system" "diskquota_customer_partition" "${DQ_C_PART}"
 		patch_default_sql "system" "diskquota_quotatool_path" "/usr/sbin/quotatool"
+
+		ewarn ""
+		ewarn "You enabled quota support"
+		ewarn "Remember to setup quota support for Gentoo manually (Kernel + Filesystem)"
+		ewarn "More Info: https://wiki.gentoo.org/wiki/Disk_quotas"
+		ewarn ""
 	fi
 
 	# default value is ssl_enabled='1'
@@ -327,13 +333,6 @@ pkg_postinst() {
 	if use fpm && use apache2; then
 		# we need this in order to apache being able to access fpm socket
 		usermod -a -G froxlor apache
-	fi
-
-	if use quota; then
-		elog "You enabled quota support"
-		elog "Remember to setup quota support for Gentoo manually (Kernel + Filesystem)"
-		elog "More Info: https://wiki.gentoo.org/wiki/Disk_quotas"
-		elog ""
 	fi
 
 	# we need to check if this is going to be an update or a fresh install!
