@@ -204,10 +204,13 @@ src_prepare() {
 		patch_default_sql "system" "bindconf_directory" "/etc/powerdns/"
 		patch_default_sql "system" "bindreload_command" "/etc/init.d/pdns restart"
 		patch_default_sql "system" "dns_server" "PowerDNS"
+		"${FILESDIR}/updateConfig.py" lib/configfiles/gentoo.xml \
+			"./distribution/defaults/default[@settinggroup='system'][@varname='bindreload_command']" value \
+			"/etc/init.d/pdns restart" || die "Unable to enable webalizer"
 
 		ewarn ""
 		ewarn "Note that you need to configure pdns and create a separate database for it, see:"
-		ewarn "https://doc.powerdns.com/3/authoritative/installation/#basic-setup-configuring-database-connectivity"
+		ewarn "https://doc.powerdns.com/authoritative/backends/generic-mysql.html"
 		ewarn ""
 	fi
 
