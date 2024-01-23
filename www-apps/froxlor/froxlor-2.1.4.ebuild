@@ -299,36 +299,44 @@ src_install() {
 		fowners -R apache:apache "${FROXLOR_DOCROOT}"
 
 		insinto /etc/apache2/modules.d/
-		newins ${FILESDIR}/apache_modules.d_00_default_settings.conf 00_default_settings.conf
+		newins "${FILESDIR}/apache_modules.d_00_default_settings.conf" 00_default_settings.conf
 
 		if use fpm ; then
 			insinto /etc/apache2/modules.d/
-			newins ${FILESDIR}/apache_fpm_modules.d_70_mod_php.conf 70_mod_php.conf
+			newins "${FILESDIR}/apache_fpm_modules.d_70_mod_php.conf" 70_mod_php.conf
 
-			newconfd ${FILESDIR}/apache_fpm_conf.d_apache2 apache2
+			newconfd "${FILESDIR}/apache_fpm_conf.d_apache2" apache2
 
-			insinto /etc/php/fpm-$(eselect php show fpm)/fpm.d/
-			newins ${FILESDIR}/php_fpm_www_apache.conf www.conf
+			# overwrite default www.conf if present
+			FPM_DIR="/etc/php/fpm-$(eselect php show fpm)/fpm.d/"
+			if [ -f "$FPM_DIR/www.conf" ]; then
+				insinto "$FPM_DIR"
+				newins "${FILESDIR}/php_fpm_www_apache.conf" www.conf
+			fi
 		elif use fcgid; then
 			insinto /etc/apache2/modules.d/
-			newins ${FILESDIR}/apache_fcgid_modules.d_20_mod_fcgid.conf 20_mod_fcgid.conf
+			newins "${FILESDIR}/apache_fcgid_modules.d_20_mod_fcgid.conf" 20_mod_fcgid.conf
 
-			newconfd ${FILESDIR}/apache_fcgid_conf.d_apache2 apache2
+			newconfd "${FILESDIR}/apache_fcgid_conf.d_apache2" apache2
 
 			dosym /usr/bin/php-cgi /var/www/localhost/htdocs/fcgid-bin/php-fcgid-wrapper
 		else
 			# mod_php
-			newconfd ${FILESDIR}/apache_mod_php_conf.d_apache2 apache2
+			newconfd "${FILESDIR}/apache_mod_php_conf.d_apache2" apache2
 		fi
 	elif use nginx; then
 		# Ensure dir is writable by nginx
 		fowners -R nginx:nginx "${FROXLOR_DOCROOT}"
 		if use fpm ; then
 			insinto /etc/nginx/
-			newins ${FILESDIR}/nginx_nginx.conf nginx.conf
+			newins "${FILESDIR}/nginx_nginx.conf" nginx.conf
 
-			insinto /etc/php/fpm-$(eselect php show fpm)/fpm.d/
-			newins ${FILESDIR}/php_fpm_www_nginx.conf www.conf
+			# overwrite default www.conf if present
+			FPM_DIR="/etc/php/fpm-$(eselect php show fpm)/fpm.d/"
+			if [ -f "$FPM_DIR/www.conf" ]; then
+				insinto "$FPM_DIR"
+				newins "${FILESDIR}/php_fpm_www_nginx.conf" www.conf
+			fi
 		fi
 	fi
 }
