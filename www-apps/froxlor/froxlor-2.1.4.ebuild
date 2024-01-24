@@ -3,17 +3,6 @@
 
 EAPI="8"
 
-if [[ ${PV} == *9999 ]] ; then
-	EGIT_REPO_URI="https://github.com/Froxlor/Froxlor.git"
-	EGIT_CHECKOUT_DIR=${WORKDIR}/${PN}
-	inherit git-r3 vcs-clean
-	KEYWORDS=""
-else
-	RESTRICT="mirror"
-	SRC_URI="https://files.froxlor.org/releases/${P}.tar.gz"
-	KEYWORDS="~amd64 ~x86"
-fi
-
 DESCRIPTION="A PHP-based webhosting-oriented control panel for servers."
 HOMEPAGE="https://www.froxlor.org/"
 
@@ -111,6 +100,21 @@ REQUIRED_USE="
 	postfix? ( dovecot )
 	proftpd? ( !pureftpd )"
 
+if [[ ${PV} == *9999 ]] ; then
+	EGIT_REPO_URI="https://github.com/Froxlor/Froxlor.git"
+	EGIT_CHECKOUT_DIR=${WORKDIR}/${PN}
+	inherit git-r3 vcs-clean
+	KEYWORDS=""
+	BDEPEND="${BDEPEND}
+		dev-php/composer
+		dev-php/pecl-gnupg
+		net-libs/nodejs"
+else
+	RESTRICT="mirror"
+	SRC_URI="https://github.com/Froxlor/Froxlor/releases/download/${PV}/${P}.tar.gz https://files.froxlor.org/releases/${P}.tar.gz"
+	KEYWORDS="~amd64 ~x86"
+fi
+
 # lets check user defined variables
 FROXLOR_DOCROOT="${FROXLOR_DOCROOT:-/var/www/froxlor/}"
 WWW_DEFAULT_DOCROOT="${WWW_DEFAULT_DOCROOT:-/var/www/localhost/htdocs/}"
@@ -120,6 +124,11 @@ S="${WORKDIR}/${PN}"
 src_unpack() {
 	if [[ ${PV} == *9999 ]] ; then
 		git-r3_src_unpack
+		pushd "${S}" > /dev/null || die
+		composer install --no-dev || die
+		npm install || die
+		npm run build || die
+		popd > /dev/null || die
 	else
 		unpack ${A}
 	fi
