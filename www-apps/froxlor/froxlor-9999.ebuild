@@ -8,12 +8,18 @@ HOMEPAGE="https://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="+apache2 awstats bind +dovecot fcgid +fpm +goaccess lighttpd mailquota nginx pdns +postfix +proftpd pureftpd quota +ssl webalizer"
+IUSE="+apache2 awstats bind fcgid +fpm +goaccess lighttpd mailquota nginx pdns +proftpd pureftpd quota +ssl webalizer"
 
 DEPEND="
+	acct-user/froxlor
+	acct-group/froxlor
+	acct-user/vmail
+	acct-group/vmail
 	app-admin/logrotate
 	app-crypt/gnupg
 	>=dev-lang/php-7.4:*[bcmath,cli,ctype,curl,filter,gd,gmp,mysql,pdo,posix,session,xml,zip]
+	>=net-mail/dovecot-2.2.0[argon2,mysql]
+	>=mail-mta/postfix-3.8[dovecot-sasl,mysql,ssl=]
 	>=sys-auth/libnss-extrausers-0.6
 	virtual/cron
 	virtual/mysql
@@ -65,19 +71,10 @@ DEPEND="
 			www-servers/nginx[nginx_modules_http_auth_basic,nginx_modules_http_fastcgi,nginx_modules_http_rewrite]
 		)
 	)
-	dovecot? (
-		acct-user/vmail
-		acct-group/vmail
-		>=net-mail/dovecot-2.2.0[argon2,mysql]
-	)
-	postfix? (
-		>=mail-mta/postfix-3.8[dovecot-sasl,mysql,ssl=]
-	)
 	quota? (
 		sys-fs/quotatool
 	)
-	acct-user/froxlor
-	acct-group/froxlor"
+	"
 
 RDEPEND="${DEPEND}"
 
@@ -97,7 +94,6 @@ REQUIRED_USE="
 		fpm
 	)
 	pdns? ( !bind )
-	postfix? ( dovecot )
 	proftpd? ( !pureftpd )"
 
 if [[ ${PV} == *9999 ]] ; then
@@ -291,15 +287,13 @@ src_prepare() {
 		patch_default_sql "system" "ftpserver" "pureftpd"
 	fi
 
-	if use dovecot || use postfix; then
-		VMAIL_UID=$(id -u vmail)
-		einfo "Setting system.vmail_uid to ${VMAIL_UID}"
-		patch_default_sql "system" "vmail_uid" "${VMAIL_UID}"
+	VMAIL_UID=$(id -u vmail)
+	einfo "Setting system.vmail_uid to ${VMAIL_UID}"
+	patch_default_sql "system" "vmail_uid" "${VMAIL_UID}"
 
-		VMAIL_GID=$(id -u vmail)
-		einfo "Setting system.vmail_gid to ${VMAIL_GID}"
-		patch_default_sql "system" "vmail_gid" "${VMAIL_GID}"
-	fi
+	VMAIL_GID=$(id -u vmail)
+	einfo "Setting system.vmail_gid to ${VMAIL_GID}"
+	patch_default_sql "system" "vmail_gid" "${VMAIL_GID}"
 }
 
 src_install() {
