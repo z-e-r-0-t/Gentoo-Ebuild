@@ -132,6 +132,19 @@ src_prepare() {
 
 	default
 
+	CUSTOM_GENTOO_XML_PATH="${FILESDIR}/gentoo-v${PV}.xml"
+	SRC_GENTOO_XML_PATH="lib/configfiles/gentoo.xml"
+	if [ -f "${CUSTOM_GENTOO_XML_PATH}" ]; then
+		einfo "Using custom .xml: ${CUSTOM_GENTOO_XML_PATH}"
+		cp "${CUSTOM_GENTOO_XML_PATH}" "${SRC_GENTOO_XML_PATH}" || die "Failed to copy xml"
+	fi
+
+	CUSTOM_PATCHES_PATH="${FILESDIR}/*-v${PV}.patch"
+	for PATCH in ${CUSTOM_PATCHES_PATH}; do
+		[ -e "$PATCH" ] || continue
+		eapply "${PATCH}"
+	done
+
 	einfo "Setting 'lastguid' to '10000'"
 	patch_default_sql "system" "lastguid" "10000"
 
@@ -205,7 +218,7 @@ src_prepare() {
 		patch_default_sql "system" "bindconf_directory" "/etc/powerdns/"
 		patch_default_sql "system" "bindreload_command" "/etc/init.d/pdns restart"
 		patch_default_sql "system" "dns_server" "PowerDNS"
-		"${FILESDIR}/updateConfig.py" lib/configfiles/gentoo.xml \
+		"${FILESDIR}/updateConfig.py" "${SRC_GENTOO_XML_PATH}" \
 			"./distribution/defaults/default[@settinggroup='system'][@varname='bindreload_command']" value \
 			"/etc/init.d/pdns restart" || die "Unable to enable webalizer"
 
@@ -244,14 +257,14 @@ src_prepare() {
 	if use awstats ; then
 		einfo "Enable awstats"
 		patch_default_sql "system" "awstats_icons" "/usr/share/awstats/wwwroot/icon/"
-		"${FILESDIR}/updateConfig.py" lib/configfiles/gentoo.xml \
+		"${FILESDIR}/updateConfig.py" "${SRC_GENTOO_XML_PATH}" \
 			"./distribution/defaults/default[@settinggroup='system'][@varname='traffictool']" value awstats \
 			|| die "Unable to enable awstats"
 	fi
 
 	if use goaccess ; then
 		einfo "Enable goaccess"
-		"${FILESDIR}/updateConfig.py" lib/configfiles/gentoo.xml \
+		"${FILESDIR}/updateConfig.py" "${SRC_GENTOO_XML_PATH}" \
 			"./distribution/defaults/default[@settinggroup='system'][@varname='traffictool']" value goaccess \
 			|| die "Unable to enable goaccess"
 	fi
@@ -259,7 +272,7 @@ src_prepare() {
 	if use webalizer ; then
 		einfo "Enable webalizer"
 		patch_default_sql "system" "webalizer_quiet" "0"
-		"${FILESDIR}/updateConfig.py" lib/configfiles/gentoo.xml \
+		"${FILESDIR}/updateConfig.py" "${SRC_GENTOO_XML_PATH}" \
 			"./distribution/defaults/default[@settinggroup='system'][@varname='traffictool']" value webalizer \
 			|| die "Unable to enable webalizer"
 	fi

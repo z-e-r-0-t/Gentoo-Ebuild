@@ -1,0 +1,47 @@
+diff --git a/lib/Froxlor/Api/Commands/EmailAccounts.php b/lib/Froxlor/Api/Commands/EmailAccounts.php
+index e560fd0d..d8799ded 100644
+--- a/lib/Froxlor/Api/Commands/EmailAccounts.php
++++ b/lib/Froxlor/Api/Commands/EmailAccounts.php
+@@ -157,10 +157,10 @@ class EmailAccounts extends ApiCommand implements ResourceEntity
+ 
+ 			// prefix hash-algo
+ 			switch (Settings::Get('system.passwordcryptfunc')) {
+-				case PASSWORD_ARGON2I:
++				case defined('PASSWORD_ARGON2I') && PASSWORD_ARGON2I:
+ 					$cpPrefix = '{ARGON2I}';
+ 					break;
+-				case PASSWORD_ARGON2ID:
++				case defined('PASSWORD_ARGON2ID') && PASSWORD_ARGON2ID:
+ 					$cpPrefix = '{ARGON2ID}';
+ 					break;
+ 				default:
+@@ -404,10 +404,10 @@ class EmailAccounts extends ApiCommand implements ResourceEntity
+ 			$password = Crypt::validatePassword($password, true);
+ 			// prefix hash-algo
+ 			switch (Settings::Get('system.passwordcryptfunc')) {
+-				case PASSWORD_ARGON2I:
++				case defined('PASSWORD_ARGON2I') && PASSWORD_ARGON2I:
+ 					$cpPrefix = '{ARGON2I}';
+ 					break;
+-				case PASSWORD_ARGON2ID:
++				case defined('PASSWORD_ARGON2ID') && PASSWORD_ARGON2ID:
+ 					$cpPrefix = '{ARGON2ID}';
+ 					break;
+ 				default:
+diff --git a/tests/Emails/EmailsTest.php b/tests/Emails/EmailsTest.php
+index a62b3ee0..64b812da 100644
+--- a/tests/Emails/EmailsTest.php
++++ b/tests/Emails/EmailsTest.php
+@@ -426,10 +426,10 @@ class MailsTest extends TestCase
+ 		$this->assertEquals(1, $result['popaccountid']);
+ 
+ 		switch (Settings::Get('system.passwordcryptfunc')) {
+-			case PASSWORD_ARGON2I:
++			case defined('PASSWORD_ARGON2I') && PASSWORD_ARGON2I:
+ 				$cpPrefix = '{ARGON2I}';
+ 				break;
+-			case PASSWORD_ARGON2ID:
++			case defined('PASSWORD_ARGON2ID') && PASSWORD_ARGON2ID:
+ 				$cpPrefix = '{ARGON2ID}';
+ 				break;
+ 			default:
