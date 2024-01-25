@@ -4,5 +4,4 @@
   <maintainer type="person">
     <email>release@froxlor.org</email>
   </maintainer>
-  <longdescription>nss module to have an additional passwd, shadow and group file.</longdescription>
 </pkgmetadata>

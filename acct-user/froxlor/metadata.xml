@@ -4,5 +4,7 @@
   <maintainer type="person">
     <email>release@froxlor.org</email>
   </maintainer>
-  <longdescription>nss module to have an additional passwd, shadow and group file.</longdescription>
+  <use>
+    <flag name='min_uid_1000'>Ensure UID is >= 1000</flag>
+  </use>
 </pkgmetadata>

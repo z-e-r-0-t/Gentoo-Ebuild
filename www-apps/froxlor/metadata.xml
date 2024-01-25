@@ -3,25 +3,24 @@
 <pkgmetadata>
   <maintainer type="person">
     <email>release@froxlor.org</email>
-      <description>Upstream Maintainer</description>
   </maintainer>
   <longdescription>A PHP-based webhosting-oriented control panel for servers.</longdescription>
   <use>
-    <flag name='awstats'>use AWStats traffic analyzer</flag>
-    <flag name='bind'>Adds support for writing BIND configuration files</flag>
-    <flag name='dovecot'>use Dovecot instead of Courier</flag>
+    <flag name='apache2'>Use Apache2 webserver</flag>
+    <flag name='awstats'>Use AWStats traffic analyzer</flag>
+    <flag name='bind'>Adds support to configure BIND DNS service</flag>
     <flag name='fcgid'>Adds support for FCGId</flag>
     <flag name='fpm'>Adds support for PHP-FPM</flag>
-    <flag name='ftpquota'>Adds support for FTP Quotas for use with ProFTPd</flag>
-    <flag name='goaccess'>use goaccess traffic analyzer</flag>
-    <flag name='lighttpd'>use ligHTTPd instead of Apache</flag>
-    <flag name='log'>Adds support for logging actions in the Panel</flag>
-    <flag name='mailquota'>Adds support for Quotas for the maildirs of
-      Customers</flag>
-    <flag name='nginx'>use nginx instead of Apache</flag>
-    <flag name='pdns'>use Power-DNS instead of Bind</flag>
-    <flag name='pureftpd'>use pure-FTPd instead of ProFTPd</flag>
+    <flag name='goaccess'>Use goaccess traffic analyzer</flag>
+    <flag name='lighttpd'>Use ligHTTPd webserver</flag>
+    <flag name='mailquota'>Adds support for Quotas for the maildirs of Customers</flag>
+    <flag name='nginx'>Use nginx webserver</flag>
+    <flag name='pdns'>Adds support to configure Power-DNS service</flag>
+    <flag name='proftpd'>Use ProFTPD for FTP service</flag>
+    <flag name='pureftpd'>Use pure-FTPd for FTP service</flag>
     <flag name='quota'>Adds support for Filesystem-Quotas</flag>
+    <flag name='ssl'>Adds SSL support</flag>
+    <flag name='webalizer'>Use webalizer traffic analyzer</flag>
   </use>
   <upstream>
     <remote-id type="cpe">cpe:/a:froxlor:froxlor</remote-id>
