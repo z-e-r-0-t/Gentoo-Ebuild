@@ -113,7 +113,6 @@ fi
 
 # lets check user defined variables
 FROXLOR_DOCROOT="${FROXLOR_DOCROOT:-/var/www/froxlor/}"
-WWW_DEFAULT_DOCROOT="${WWW_DEFAULT_DOCROOT:-/var/www/localhost/htdocs/}"
 
 S="${WORKDIR}/${PN}"
 
@@ -302,15 +301,8 @@ src_install() {
 
 	fperms 0755 "${FROXLOR_DOCROOT}/bin/froxlor-cli"
 
-	# Create symbolic link to froxlor docroot
-	if [[ -d "${WWW_DEFAULT_DOCROOT}" ]]; then
-		FROXLOR_APACHE_LINK="${WWW_DEFAULT_DOCROOT}froxlor"
-		dosym -r "${ROOT}${FROXLOR_DOCROOT}" "${FROXLOR_APACHE_LINK}"
-	else
-		ewarn "Unable to find existing www default htdocs root. Please manually adjust your docroot if necessary."
-	fi
-
 	if use apache2; then
+		WWW_DEFAULT_DOCROOT="/var/www/localhost/htdocs/"
 		# Ensure dir is writable by apache
 		fowners -R apache:apache "${FROXLOR_DOCROOT}"
 
@@ -341,6 +333,7 @@ src_install() {
 			newconfd "${FILESDIR}/apache_mod_php_conf.d_apache2" apache2
 		fi
 	elif use nginx; then
+		WWW_DEFAULT_DOCROOT="/var/www/localhost/"
 		# Ensure dir is writable by nginx
 		fowners -R nginx:nginx "${FROXLOR_DOCROOT}"
 		if use fpm ; then
@@ -354,6 +347,17 @@ src_install() {
 				newins "${FILESDIR}/php_fpm_www_nginx.conf" www.conf
 			fi
 		fi
+	fi
+
+	# Create symbolic link to froxlor docroot
+	if [[ -n ${WWW_DEFAULT_DOCROOT} && -d "${WWW_DEFAULT_DOCROOT}" ]]; then
+		FROXLOR_LINK="${WWW_DEFAULT_DOCROOT}froxlor"
+		dosym -r "${ROOT}${FROXLOR_DOCROOT}" "${FROXLOR_LINK}"
+		echo "${WWW_DEFAULT_DOCROOT}"
+	else
+		ewarn ""
+		ewarn "Unable to find existing www default htdocs root. Please manually adjust your docroot if necessary."
+		ewarn ""
 	fi
 }
 
