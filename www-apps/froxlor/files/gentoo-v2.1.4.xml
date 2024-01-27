@@ -12,7 +12,7 @@
 			<default for="apache24" settinggroup="system" varname="apacheconf_htpasswddir" value="/etc/apache2/froxlor-htpasswd/"></default>
 			<default for="apache24" settinggroup="system" varname="apachereload_command" value="/etc/init.d/apache2 reload"></default>
 			<!-- TODO how does this work on gentoo? -->
-			<default for="apache24" settinggroup="system" varname="letsencryptacmeconf" value="/etc/apache2/acme.conf"></default>
+			<default for="apache24" settinggroup="system" varname="letsencryptacmeconf" value="/etc/apache2/vhosts.d/acme.conf"></default>
 			<default for="lighttpd" settinggroup="system" varname="apacheconf_vhost" value="/etc/lighttpd/vhosts.d/"></default>
 			<default for="lighttpd" settinggroup="system" varname="apacheconf_diroptions" value="/etc/lighttpd/diropts.d/"></default>
 			<default for="lighttpd" settinggroup="system" varname="apacheconf_htpasswddir" value="/etc/lighttpd/froxlor-htpasswd/"></default>
@@ -53,21 +53,6 @@
 				<daemon name="apache" version="2.4" title="Apache 2.4">
 					<install><![CDATA[emerge --noreplace --newuse --oneshot --jobs --verbose www-servers/apache]]></install>
 					<include>//service[@type='http']/general/commands</include>
-					<file name="/etc/apache2/modules.d/70_fastcgi.conf">
-						<visibility mode="true">{{settings.phpfpm.enabled}}
-						</visibility>
-						<content><![CDATA[
-<IfModule mod_fastcgi.c>
-    FastCgiIpcDir <FPM_IPCDIR>
-
-    <Location "/fastcgiphp">
-		Require all granted
-        Require env REDIRECT_STATUS
-    </Location>
-</IfModule>
-]]>
-						</content>
-					</file>
 					<file name="{{settings.system.letsencryptacmeconf}}">
 						<visibility mode="true">{{settings.system.leenabled}}
 						</visibility>
@@ -85,6 +70,7 @@ Alias "/.well-known/acme-challenge" "{{settings.system.letsencryptchallengepath}
 				<!-- HTTP Lighttpd -->
 				<daemon name="lighttpd" title="LigHTTPd (deprecated)">
 					<install><![CDATA[emerge --noreplace --newuse --oneshot --jobs --verbose www-servers/lighttpd]]></install>
+					<include>//service[@type='http']/general/commands</include>
 					<file name="/etc/lighttpd/lighttpd.conf">
 						<content><![CDATA[
 ###############################################################################
@@ -177,6 +163,7 @@ alias.url           += ("/.well-known/acme-challenge/" => "{{settings.system.let
 				<!-- HTTP Nginx -->
 				<daemon name="nginx" title="nginx">
 					<install><![CDATA[emerge --noreplace --newuse --oneshot --jobs --verbose www-servers/nginx]]></install>
+					<include>//service[@type='http']/general/commands</include>
 					<file name="/etc/nginx/nginx.conf" backup="true">
 						<content><![CDATA[
 user nginx nginx;
