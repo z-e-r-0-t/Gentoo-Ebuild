@@ -161,7 +161,7 @@ src_prepare() {
 	# set correct webserver reload
 	if use lighttpd; then
 		einfo "Switching settings to fit 'lighttpd'"
-		patch_default_sql "system" "apachereload_command" "/etc/init.d/lighttpd restart"
+		patch_default_sql "system" "apachereload_command" "$(get_restart_command lighttpd restart)"
 		patch_default_sql "system" "webserver" "lighttpd"
 		patch_default_sql "system" "apacheconf_vhost" "/etc/lighttpd/vj/"
 		patch_default_sql "system" "apacheconf_diroptions" "/etc/lighttpd/diroptions.conf"
@@ -171,7 +171,7 @@ src_prepare() {
 		patch_default_sql "phpfpm" "fastcgi_ipcdir" "/var/run/lighttpd/"
 	elif use nginx; then
 		einfo "Switching settings to fit 'nginx'"
-		patch_default_sql "system" "apachereload_command" "/etc/init.d/nginx restart"
+		patch_default_sql "system" "apachereload_command" "$(get_restart_command nginx restart)"
 		patch_default_sql "system" "webserver" "nginx"
 		patch_default_sql "system" "apacheconf_vhost" "/etc/nginx/vhosts.d/"
 		patch_default_sql "system" "apacheconf_diroptions" "/etc/nginx/diroptions.conf"
@@ -181,6 +181,7 @@ src_prepare() {
 		patch_default_sql "phpfpm" "fastcgi_ipcdir" "/var/run/nginx/"
 	else
 		einfo "Switching settings to fit 'apache2'"
+		patch_default_sql "system" "apachereload_command" "$(get_restart_command apache2 reload)"
 		patch_default_sql "system" "apacheconf_vhost" "/etc/apache2/vhosts.d/"
 		patch_default_sql "system" "apacheconf_diroptions" "/etc/apache2/vhosts.d/"
 		patch_default_sql "system" "httpuser" "apache"
@@ -213,18 +214,18 @@ src_prepare() {
 	if use bind ; then
 		einfo "Setting bind9 reload command"
 		patch_default_sql "system" "bind_enable" "1"
-		patch_default_sql "system" "bindreload_command" "/etc/init.d/named reload"
+		patch_default_sql "system" "bindreload_command" "$(get_restart_command named reload)"
 	fi
 
 	if use pdns ; then
 		einfo "Switching from 'bind' to 'powerdns'"
 		patch_default_sql "system" "bind_enable" "1"
 		patch_default_sql "system" "bindconf_directory" "/etc/powerdns/"
-		patch_default_sql "system" "bindreload_command" "/etc/init.d/pdns restart"
+		patch_default_sql "system" "bindreload_command" "$(get_restart_command pdns restart)"
 		patch_default_sql "system" "dns_server" "PowerDNS"
 		"${FILESDIR}/updateConfig.py" "${SRC_GENTOO_XML_PATH}" \
 			"./distribution/defaults/default[@settinggroup='system'][@varname='bindreload_command']" value \
-			"/etc/init.d/pdns restart" || die "Unable to enable webalizer"
+			"$(get_restart_command pdns restart)" || die "Unable to enable webalizer"
 
 		ewarn ""
 		ewarn "Note that you need to configure pdns and create a separate database for it, see:"
@@ -293,6 +294,21 @@ src_prepare() {
 	VMAIL_GID=$(id -u vmail)
 	einfo "Setting system.vmail_gid to ${VMAIL_GID}"
 	patch_default_sql "system" "vmail_gid" "${VMAIL_GID}"
+
+	patch_default_sql "system" "crondreload" "$(get_restart_command cronie restart)"
+
+	if is_systemd; then
+		sed -i 's/\/etc\/init\.d\/\([^ ]\+\) \(restart\|reload\)/systemctl \2 \1.service/g' "${SRC_GENTOO_XML_PATH}" \
+			|| die "Unable to patch init.d for systemd"
+		if use fpm; then
+			FPM_VERSION=$(eselect php show fpm | grep -Eo '[0-9\.]+')
+			sed -i "s/^\([[:space:]]\+\$reload = \).*/\1\"$(get_restart_command php-fpm@"${FPM_VERSION}" restart)\";/g" \
+				"${S}/lib/Froxlor/Install/Install/Core.php" || die "Unable to patch installer php-fpm systemd"
+		fi
+	else
+		sed -i "s/^\([[:space:]]\+\$reload = \).*/\1\"$(get_restart_command php-fpm restart | sed -e 's/\//\\\//g')\";/g" \
+			"${S}/lib/Froxlor/Install/Install/Core.php" || die "Unable to patch installer php-fpm openrc"
+	fi
 }
 
 src_install() {
@@ -375,14 +391,15 @@ pkg_postinst() {
 		elog "it in your browser the first time after the update-process."
 	else
 		elog "Don't forget to setup your MySQL databases root user and password"
-		elog "using \"emerge --config mysql\" or \"emerge --config mariadb\"."
+		elog "using \"emerge --config mariadb\" or \"emerge --config mysql\"."
 		elog
 		elog "Don't forget to apply possible config changes, e.g. using \"dispatch-conf\""
 		elog
-		elog "Don't forget to restart services after config change, e.g. \"/etc/init.d/... restart\""
+		elog "Don't forget to start/restart services after config change, e.g. \"$(get_restart_command XXX restart)\""
+		elog "in order to be able to access the web installer."
 		elog
-		elog "Please open http://[ip]/froxlor in your browser to continue"
-		elog "with the basic setup of Froxlor."
+		elog "Please open http://[ip]/froxlor in your browser to continue with web installer"
+		elog "and basic setup of Froxlor."
 	fi
 }
 
@@ -396,4 +413,22 @@ patch_default_sql() {
 
 	grep -E "${SEARCH}" "${SQL_FILE}" &>/dev/null || die "Unable to find key: ${KEY_PRETTY}"
 	sed -E -e "s|${SEARCH}|\1'${NEW_VALUE}'\2|g" -i "${SQL_FILE}" || die "Unable to patch key: ${KEY_PRETTY}"
+}
+
+get_restart_command() {
+	service="$1"
+	action="$2"
+	if is_systemd; then
+		echo "systemctl ${action} ${service}.service"
+	else
+		echo "/etc/init.d/${service} ${action}"
+	fi
+}
+
+is_systemd() {
+	if which systemctl &>/dev/null; then
+		return 0;
+	else
+		return 1;
+	fi;
 }
