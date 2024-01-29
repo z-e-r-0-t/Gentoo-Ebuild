@@ -21,7 +21,7 @@ DEPEND="
 	>=net-mail/dovecot-2.2.0[argon2,mysql]
 	>=mail-mta/postfix-3.8[dovecot-sasl,mysql,ssl=]
 	>=sys-auth/libnss-extrausers-0.6
-	virtual/cron
+	sys-process/cronie
 	virtual/mysql
 	pureftpd? (
 		net-ftp/pure-ftpd[mysql,ssl=]
