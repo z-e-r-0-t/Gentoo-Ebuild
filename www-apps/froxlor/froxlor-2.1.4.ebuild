@@ -125,7 +125,7 @@ src_unpack() {
 		npm run build || die
 		popd > /dev/null || die
 	else
-		unpack ${A}
+		unpack "${A}"
 	fi
 }
 
@@ -150,101 +150,91 @@ src_prepare() {
 	done
 
 	einfo "Setting 'lastguid' to '10000'"
-	patch_default_sql "system" "lastguid" "10000"
+	patch_defaults "system" "lastguid" "10000"
 
 	einfo "Updating httpuser"
-	patch_default_sql "phpfpm" "vhost_httpuser" "froxlor"
-	patch_default_sql "phpfpm" "vhost_httpgroup" "froxlor"
-	patch_default_sql "system" "mod_fcgid_httpuser" "froxlor"
-	patch_default_sql "system" "mod_fcgid_httpgroup" "froxlor"
+	patch_defaults "phpfpm" "vhost_httpuser" "froxlor"
+	patch_defaults "phpfpm" "vhost_httpgroup" "froxlor"
+	patch_defaults "system" "mod_fcgid_httpuser" "froxlor"
+	patch_defaults "system" "mod_fcgid_httpgroup" "froxlor"
 
 	# set correct webserver reload
 	if use lighttpd; then
 		einfo "Switching settings to fit 'lighttpd'"
-		patch_default_sql "system" "apachereload_command" "$(get_restart_command lighttpd restart)"
-		patch_default_sql "system" "webserver" "lighttpd"
-		patch_default_sql "system" "apacheconf_vhost" "/etc/lighttpd/vj/"
-		patch_default_sql "system" "apacheconf_diroptions" "/etc/lighttpd/diroptions.conf"
-		patch_default_sql "system" "apacheconf_htpasswddir" "/etc/lighttpd/htpasswd/"
-		patch_default_sql "system" "httpuser" "lighttpd"
-		patch_default_sql "system" "httpgroup" "lighttpd"
-		patch_default_sql "phpfpm" "fastcgi_ipcdir" "/var/run/lighttpd/"
+		patch_defaults "system" "apachereload_command" "$(get_restart_command lighttpd restart)"
+		patch_defaults "system" "webserver" "lighttpd"
+		patch_defaults "system" "apacheconf_vhost" "/etc/lighttpd/vj/"
+		patch_defaults "system" "apacheconf_diroptions" "/etc/lighttpd/diroptions.conf"
+		patch_defaults "system" "apacheconf_htpasswddir" "/etc/lighttpd/htpasswd/"
+		patch_defaults "system" "httpuser" "lighttpd"
+		patch_defaults "system" "httpgroup" "lighttpd"
+		patch_defaults "phpfpm" "fastcgi_ipcdir" "/var/run/lighttpd/"
 	elif use nginx; then
 		einfo "Switching settings to fit 'nginx'"
-		patch_default_sql "system" "apachereload_command" "$(get_restart_command nginx restart)"
-		patch_default_sql "system" "webserver" "nginx"
-		patch_default_sql "system" "apacheconf_vhost" "/etc/nginx/vhosts.d/"
-		patch_default_sql "system" "apacheconf_diroptions" "/etc/nginx/diroptions.conf"
-		patch_default_sql "system" "apacheconf_htpasswddir" "/etc/nginx/htpasswd/"
-		patch_default_sql "system" "httpuser" "nginx"
-		patch_default_sql "system" "httpgroup" "nginx"
-		patch_default_sql "phpfpm" "fastcgi_ipcdir" "/var/run/nginx/"
+		patch_defaults "system" "apachereload_command" "$(get_restart_command nginx restart)"
+		patch_defaults "system" "webserver" "nginx"
+		patch_defaults "system" "apacheconf_vhost" "/etc/nginx/vhosts.d/"
+		patch_defaults "system" "apacheconf_diroptions" "/etc/nginx/diroptions.conf"
+		patch_defaults "system" "apacheconf_htpasswddir" "/etc/nginx/htpasswd/"
+		patch_defaults "system" "httpuser" "nginx"
+		patch_defaults "system" "httpgroup" "nginx"
+		patch_defaults "phpfpm" "fastcgi_ipcdir" "/var/run/nginx/"
 	else
 		einfo "Switching settings to fit 'apache2'"
-		patch_default_sql "system" "apachereload_command" "$(get_restart_command apache2 reload)"
-		patch_default_sql "system" "apacheconf_vhost" "/etc/apache2/vhosts.d/"
-		patch_default_sql "system" "apacheconf_diroptions" "/etc/apache2/vhosts.d/"
-		patch_default_sql "system" "httpuser" "apache"
-		patch_default_sql "system" "httpgroup" "apache"
-	fi
-
-	if use fcgid && ! use lighttpd && ! use nginx ; then
-		einfo "Switching 'fcgid' to 'On'"
-		patch_default_sql "system" "mod_fcgid" "1"
-
-		einfo "Setting wrapper to FcgidWrapper"
-		patch_default_sql "system" "mod_fcgid_wrapper" "1"
+		patch_defaults "system" "apachereload_command" "$(get_restart_command apache2 reload)"
+		patch_defaults "system" "apacheconf_vhost" "/etc/apache2/vhosts.d/"
+		patch_defaults "system" "apacheconf_diroptions" "/etc/apache2/vhosts.d/"
+		patch_defaults "system" "httpuser" "apache"
+		patch_defaults "system" "httpgroup" "apache"
 	fi
 
 	if use fpm ; then
 		einfo "Switching 'fpm' to 'On'"
-		patch_default_sql "phpfpm" "enabled" "1"
-	elif use fcgid; then
-		einfo "Switching 'fcgid' to 'On'"
-		patch_default_sql "system" "mod_fcgid" "1"
+		patch_defaults "phpfpm" "enabled" "1"
+	elif use fcgid and use apache2; then
+		einfo "Adjusting settings for apache2 with fcgid"
+		patch_defaults "system" "mod_fcgid" "1"
+		patch_defaults "system" "mod_fcgid_wrapper" "1"
 	fi
 
 	# If Bind and pdns will not be used disable nameserver.
 	if ! use bind && ! use pdns; then
 		einfo "Disabling nameserver"
-		patch_default_sql "system" "bind_enable" "0"
-		patch_default_sql "system" "bindreload_command" "/bin/true"
+		patch_defaults "system" "bind_enable" "0"
+		patch_defaults "system" "bindreload_command" "/bin/true"
 	fi
 
 	if use bind ; then
 		einfo "Setting bind9 reload command"
-		patch_default_sql "system" "bind_enable" "1"
-		patch_default_sql "system" "bindreload_command" "$(get_restart_command named reload)"
+		patch_defaults "system" "bind_enable" "1"
+		patch_defaults "system" "bindreload_command" "$(get_restart_command named reload)"
 	fi
 
 	if use pdns ; then
 		einfo "Switching from 'bind' to 'powerdns'"
-		patch_default_sql "system" "bind_enable" "1"
-		patch_default_sql "system" "bindconf_directory" "/etc/powerdns/"
-		patch_default_sql "system" "bindreload_command" "$(get_restart_command pdns restart)"
-		patch_default_sql "system" "dns_server" "PowerDNS"
-		"${FILESDIR}/updateConfig.py" "${SRC_GENTOO_XML_PATH}" \
-			"./distribution/defaults/default[@settinggroup='system'][@varname='bindreload_command']" value \
-			"$(get_restart_command pdns restart)" || die "Unable to enable webalizer"
+		patch_defaults "system" "bind_enable" "1"
+		patch_defaults "system" "bindconf_directory" "/etc/powerdns/"
+		patch_defaults "system" "bindreload_command" "$(get_restart_command pdns restart)"
+		patch_defaults "system" "dns_server" "PowerDNS"
+		patch_defaults "system" "bindreload_command" "$(get_restart_command pdns restart)"
 
 		ewarn ""
-		ewarn "Note that you need to configure pdns and create a separate database for it, see:"
+		ewarn "Note that you need to configure pdns and create a separate database for it. More details:"
 		ewarn "https://doc.powerdns.com/authoritative/backends/generic-mysql.html"
 		ewarn ""
 	fi
 
-	# default value is mailquota='0'
 	if use mailquota ; then
 		einfo "Switching 'mailquota' to 'On'"
-		patch_default_sql "system" "mail_quota_enabled" "1"
+		patch_defaults "system" "mail_quota_enabled" "1"
 	fi
 
 	if use quota ; then
 		einfo "Switching 'system_diskquota_enabled' to 'On'"
-		patch_default_sql "system" "diskquota_enabled" "1"
+		patch_defaults "system" "diskquota_enabled" "1"
 		DQ_C_PART=$(df /var/ | tail -n 1 | cut -d ' ' -f1)
-		patch_default_sql "system" "diskquota_customer_partition" "${DQ_C_PART}"
-		patch_default_sql "system" "diskquota_quotatool_path" "/usr/sbin/quotatool"
+		patch_defaults "system" "diskquota_customer_partition" "${DQ_C_PART}"
+		patch_defaults "system" "diskquota_quotatool_path" "/usr/sbin/quotatool"
 
 		ewarn ""
 		ewarn "You enabled quota support"
@@ -256,55 +246,46 @@ src_prepare() {
 	# default value is ssl_enabled='1'
 	if ! use ssl ; then
 		einfo "Switching 'SSL' to 'Off'"
-		patch_default_sql "system" "use_ssl" "0"
+		patch_defaults "system" "use_ssl" "0"
 	fi
 
 	if use awstats ; then
 		einfo "Enable awstats"
-		patch_default_sql "system" "awstats_icons" "/usr/share/awstats/wwwroot/icon/"
-		"${FILESDIR}/updateConfig.py" "${SRC_GENTOO_XML_PATH}" \
-			"./distribution/defaults/default[@settinggroup='system'][@varname='traffictool']" value awstats \
-			|| die "Unable to enable awstats"
+		patch_defaults "system" "awstats_icons" "/usr/share/awstats/wwwroot/icon/"
+		patch_defaults "system" "traffictool" "awstats"
 	fi
 
 	if use goaccess ; then
 		einfo "Enable goaccess"
-		"${FILESDIR}/updateConfig.py" "${SRC_GENTOO_XML_PATH}" \
-			"./distribution/defaults/default[@settinggroup='system'][@varname='traffictool']" value goaccess \
-			|| die "Unable to enable goaccess"
+		patch_defaults "system" "traffictool" "goaccess"
 	fi
 
 	if use webalizer ; then
 		einfo "Enable webalizer"
-		patch_default_sql "system" "webalizer_quiet" "0"
-		"${FILESDIR}/updateConfig.py" "${SRC_GENTOO_XML_PATH}" \
-			"./distribution/defaults/default[@settinggroup='system'][@varname='traffictool']" value webalizer \
-			|| die "Unable to enable webalizer"
+		patch_defaults "system" "webalizer_quiet" "0"
+		patch_defaults "system" "traffictool" "webalizer"
 	fi
 
 	if use pureftpd ; then
 		einfo "Switching from 'ProFTPd' to 'Pure-FTPd'"
-		patch_default_sql "system" "ftpserver" "pureftpd"
+		patch_defaults "system" "ftpserver" "pureftpd"
 	fi
 
 	VMAIL_UID=$(id -u vmail)
-	einfo "Setting system.vmail_uid to ${VMAIL_UID}"
-	patch_default_sql "system" "vmail_uid" "${VMAIL_UID}"
-
+	patch_defaults "system" "vmail_uid" "${VMAIL_UID}"
 	VMAIL_GID=$(id -u vmail)
-	einfo "Setting system.vmail_gid to ${VMAIL_GID}"
-	patch_default_sql "system" "vmail_gid" "${VMAIL_GID}"
+	patch_defaults "system" "vmail_gid" "${VMAIL_GID}"
 
-	patch_default_sql "system" "crondreload" "$(get_restart_command cronie restart)"
+	patch_defaults "system" "crondreload" "$(get_restart_command cronie restart)"
 
-	# Patch service restart for systemd
 	if is_systemd; then
+		einfo "Patching service restart for systemd"
 		sed -i 's/\/etc\/init\.d\/\([^ ]\+\) \(restart\|reload\)/systemctl \2 \1.service/g' "${SRC_GENTOO_XML_PATH}" \
 			|| die "Unable to patch init.d for systemd"
 	fi
 
-	# Patch hardcoded installer values for PHP FPM
 	if use fpm; then
+		einfo "Patching web installer for PHP FPM"
 		PHP_FPM_VERSION=$(eselect php show fpm | grep -Eo '[0-9\.]+')
 		if is_systemd; then
 			sed -i "s/^\([[:space:]]\+\$reload = \).*/\1\"$(get_restart_command php-fpm@"${PHP_FPM_VERSION}" restart)\";/g" \
@@ -314,11 +295,12 @@ src_prepare() {
 				"${S}/lib/Froxlor/Install/Install/Core.php" || die "Unable to patch installer php-fpm openrc"
 		fi
 		sed -i "s/^\([[:space:]]\+\$config_dir = \).*/\1\"\/etc\/php\/fpm-php${PHP_FPM_VERSION}\/fpm.d\/\";/g" \
-			"${S}/lib/Froxlor/Install/Install/Core.php" || die "Unable to patch installer php-fpm openrc"
+			"${S}/lib/Froxlor/Install/Install/Core.php" || die "Unable to patch installer php-fpm dir"
 	elif use fcgid; then
+		einfo "Patch web installer for PHP fcgid"
 		PHP_CGI_VERSION=$(eselect php show cgi | grep -Eo '[0-9\.]+')
 		sed -i "s/^\([[:space:]]\+\$binary = \).*/\1\"\/usr\/bin\/php-cgi${PHP_CGI_VERSION}\";/g" \
-			"${S}/lib/Froxlor/Install/Install/Core.php" || die "Unable to patch installer php-fpm openrc"
+			"${S}/lib/Froxlor/Install/Install/Core.php" || die "Unable to patch installer php-cgi path"
 	fi
 }
 
@@ -380,7 +362,6 @@ src_install() {
 	if [[ -n ${WWW_DEFAULT_DOCROOT} && -d "${WWW_DEFAULT_DOCROOT}" ]]; then
 		FROXLOR_LINK="${WWW_DEFAULT_DOCROOT}froxlor"
 		dosym -r "${ROOT}${FROXLOR_DOCROOT}" "${FROXLOR_LINK}"
-		echo "${WWW_DEFAULT_DOCROOT}"
 	else
 		ewarn ""
 		ewarn "Unable to find existing www default htdocs root. Please manually adjust your docroot if necessary."
@@ -414,16 +395,10 @@ pkg_postinst() {
 	fi
 }
 
-patch_default_sql() {
-	KEY="'$1', '$2', "
-	KEY_PRETTY="$1.$2"
-	NEW_VALUE="$3"
-	SQL_FILE="${S}/install/froxlor.sql.php"
-	OLD_VALUE="'[^']*'"
-	SEARCH="(\(${KEY})${OLD_VALUE}(\),?)\$"
-
-	grep -E "${SEARCH}" "${SQL_FILE}" &>/dev/null || die "Unable to find key: ${KEY_PRETTY}"
-	sed -E -e "s|${SEARCH}|\1'${NEW_VALUE}'\2|g" -i "${SQL_FILE}" || die "Unable to patch key: ${KEY_PRETTY}"
+patch_defaults() {
+	einfo "Updating default '$1:$2' to '$3'"
+	"${FILESDIR}/updateDefaults.py" "lib/configfiles/gentoo.xml" \
+			"$1" "$2" "$3" || die "Unable to updateDefaults: $1, $2, $3"
 }
 
 get_restart_command() {
