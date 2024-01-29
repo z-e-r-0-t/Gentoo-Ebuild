@@ -89,12 +89,15 @@ REQUIRED_USE="
 		goaccess
 		webalizer
 	)
+	^^ (
+		proftpd
+		pureftpd
+	)
 	fcgid? ( !fpm )
 	nginx? (
 		fpm
 	)
-	pdns? ( !bind )
-	proftpd? ( !pureftpd )"
+	pdns? ( !bind )"
 
 if [[ ${PV} == *9999 ]] ; then
 	EGIT_REPO_URI="https://github.com/Froxlor/Froxlor.git"
