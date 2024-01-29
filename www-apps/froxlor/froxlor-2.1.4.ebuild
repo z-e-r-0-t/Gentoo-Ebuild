@@ -297,16 +297,27 @@ src_prepare() {
 
 	patch_default_sql "system" "crondreload" "$(get_restart_command cronie restart)"
 
+	# Patch service restart for systemd
 	if is_systemd; then
 		sed -i 's/\/etc\/init\.d\/\([^ ]\+\) \(restart\|reload\)/systemctl \2 \1.service/g' "${SRC_GENTOO_XML_PATH}" \
 			|| die "Unable to patch init.d for systemd"
-		if use fpm; then
-			FPM_VERSION=$(eselect php show fpm | grep -Eo '[0-9\.]+')
-			sed -i "s/^\([[:space:]]\+\$reload = \).*/\1\"$(get_restart_command php-fpm@"${FPM_VERSION}" restart)\";/g" \
+	fi
+
+	# Patch hardcoded installer values for PHP FPM
+	if use fpm; then
+		PHP_FPM_VERSION=$(eselect php show fpm | grep -Eo '[0-9\.]+')
+		if is_systemd; then
+			sed -i "s/^\([[:space:]]\+\$reload = \).*/\1\"$(get_restart_command php-fpm@"${PHP_FPM_VERSION}" restart)\";/g" \
 				"${S}/lib/Froxlor/Install/Install/Core.php" || die "Unable to patch installer php-fpm systemd"
+		else
+			sed -i "s/^\([[:space:]]\+\$reload = \).*/\1\"$(get_restart_command php-fpm restart | sed -e 's/\//\\\//g')\";/g" \
+				"${S}/lib/Froxlor/Install/Install/Core.php" || die "Unable to patch installer php-fpm openrc"
 		fi
-	else
-		sed -i "s/^\([[:space:]]\+\$reload = \).*/\1\"$(get_restart_command php-fpm restart | sed -e 's/\//\\\//g')\";/g" \
+		sed -i "s/^\([[:space:]]\+\$config_dir = \).*/\1\"\/etc\/php\/fpm-php${PHP_FPM_VERSION}\/fpm.d\/\";/g" \
+			"${S}/lib/Froxlor/Install/Install/Core.php" || die "Unable to patch installer php-fpm openrc"
+	elif use fcgid; then
+		PHP_CGI_VERSION=$(eselect php show cgi | grep -Eo '[0-9\.]+')
+		sed -i "s/^\([[:space:]]\+\$binary = \).*/\1\"\/usr\/bin\/php-cgi${PHP_CGI_VERSION}\";/g" \
 			"${S}/lib/Froxlor/Install/Install/Core.php" || die "Unable to patch installer php-fpm openrc"
 	fi
 }
