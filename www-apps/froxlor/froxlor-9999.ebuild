@@ -9,6 +9,7 @@ HOMEPAGE="https://www.froxlor.org/"
 LICENSE="GPL-2"
 SLOT="0"
 IUSE="+apache2 awstats bind fcgid +fpm +goaccess lighttpd mailquota nginx pdns +proftpd pureftpd quota rspamd +ssl webalizer"
+KEYWORDS="~amd64 ~x86"
 
 DEPEND="
 	acct-user/froxlor
@@ -106,7 +107,7 @@ if [[ ${PV} == *9999 ]] ; then
 	EGIT_REPO_URI="https://github.com/Froxlor/Froxlor.git"
 	EGIT_CHECKOUT_DIR=${WORKDIR}/${PN}
 	inherit git-r3 vcs-clean
-	KEYWORDS=""
+
 	BDEPEND="${BDEPEND}
 		dev-php/composer
 		dev-php/pecl-gnupg
@@ -114,7 +115,6 @@ if [[ ${PV} == *9999 ]] ; then
 else
 	RESTRICT="mirror"
 	SRC_URI="https://github.com/Froxlor/Froxlor/releases/download/${PV}/${P}.tar.gz https://files.froxlor.org/releases/${P}.tar.gz"
-	KEYWORDS="~amd64 ~x86"
 fi
 
 # lets check user defined variables
@@ -357,7 +357,7 @@ src_install() {
 
 			newconfd "${FILESDIR}/apache_fcgid_conf.d_apache2" apache2
 
-			dosym /usr/bin/php-cgi /var/www/localhost/htdocs/fcgid-bin/php-fcgid-wrapper
+			dosym -r /usr/bin/php-cgi /var/www/localhost/htdocs/fcgid-bin/php-fcgid-wrapper
 		else
 			# mod_php
 			newconfd "${FILESDIR}/apache_mod_php_conf.d_apache2" apache2
@@ -382,7 +382,7 @@ src_install() {
 	# Create symbolic link to froxlor docroot
 	if [[ -n ${WWW_DEFAULT_DOCROOT} && -d "${WWW_DEFAULT_DOCROOT}" ]]; then
 		FROXLOR_LINK="${WWW_DEFAULT_DOCROOT}froxlor"
-		dosym -r "${ROOT}${FROXLOR_DOCROOT}" "${FROXLOR_LINK}"
+		dosym -r "${FROXLOR_DOCROOT}" "${FROXLOR_LINK}"
 	else
 		ewarn ""
 		ewarn "Unable to find existing www default htdocs root. Please manually adjust your docroot if necessary."
