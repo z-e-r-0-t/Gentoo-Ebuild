@@ -65,7 +65,6 @@ Alias "/.well-known/acme-challenge" "{{settings.system.letsencryptchallengepath}
 ]]>
 						</content>
 					</file>
-					<command><![CDATA[rc-update add apache2 default]]></command>
 					<command><![CDATA[{{settings.system.apachereload_command}}]]></command>
 				</daemon>
 				<!-- HTTP Lighttpd -->
@@ -158,7 +157,6 @@ alias.url           += ("/.well-known/acme-challenge/" => "{{settings.system.let
 						</visibility>
 						<content><![CDATA[echo -e '\\ninclude "{{settings.system.apacheconf_diroptions}}"' >> /etc/lighttpd/lighttpd.conf]]></content>
 					</command>
-					<command><![CDATA[rc-update add lighttpd default]]></command>
 					<command><![CDATA[{{settings.system.apachereload_command}}]]></command>
 				</daemon>
 				<!-- HTTP Nginx -->
@@ -221,7 +219,6 @@ location /.well-known/acme-challenge {
 ]]>
 						</content>
 					</file>
-					<command><![CDATA[rc-update add nginx default]]></command>
 					<command><![CDATA[{{settings.system.apachereload_command}}]]></command>
 				</daemon>
 			</service>
@@ -261,7 +258,6 @@ mail	IN		A	<SERVERIP>
 					<command><![CDATA[chown named:0 {{settings.system.bindconf_directory}}froxlor_bind.conf]]></command>
 					<command><![CDATA[chmod 0644 {{settings.system.bindconf_directory}}froxlor_bind.conf]]></command>
 					<command><![CDATA[sed -i.bak 's/\(listen-on\(-v6\)\?\)[[:space:]]\+{[^}]\+}/\1 { any; }/g' /etc/bind/named.conf]]></command>
-					<command><![CDATA[rc-update add named default]]></command>
 					<command><![CDATA[/etc/init.d/named restart]]></command>
 				</daemon>
 				<daemon name="powerdns" title="PowerDNS (standalone)">
@@ -1650,7 +1646,6 @@ root:               <ADMIN_MAIL>
 					</files>
 					<commands index="3">
 						<command><![CDATA[newaliases]]></command>
-						<command><![CDATA[rc-update add postfix default]]></command>
 						<command><![CDATA[/etc/init.d/postfix restart]]></command>
 					</commands>
 				</general>
@@ -2684,7 +2679,6 @@ plugin {
 					<command><![CDATA[sed -i.bak 's/^[#[:blank:]]*last_valid_uid[[:blank:]]*=.*$/last_valid_uid = {{settings.system.vmail_uid}}/' /etc/dovecot/conf.d/10-mail.conf]]></command>
 					<include>//service[@type='mail']/general/commands[@index=1]
 					</include>
-					<command><![CDATA[rc-update add dovecot default]]></command>
 				</daemon>
 			</service>
 			<!-- Antispam services -->
@@ -2762,7 +2756,6 @@ action = "no action";
 						<command><![CDATA[postconf -e "smtpd_milters = inet:127.0.0.1:11332"]]></command>
 						<command><![CDATA[postconf -e "non_smtpd_milters = inet:127.0.0.1:11332"]]></command>
 						<command><![CDATA[chown -R rspamd:rspamd /var/lib/rspamd/dkim]]></command>
-						<command><![CDATA[rc-update add rspamd default]]></command>
 						<command><![CDATA[/etc/init.d/rspamd restart]]></command>
 					</commands>
 				</general>
@@ -3131,7 +3124,6 @@ MaxLoginAttempts 3
 ]]>
 						</content>
 					</file>
-					<command><![CDATA[rc-update add proftpd default]]></command>
 					<command><![CDATA[/etc/init.d/proftpd restart]]></command>
 				</daemon>
 				<!-- Pureftpd -->
@@ -3640,7 +3632,6 @@ MySQLGetQTASZ   SELECT CASE WHEN panel_customers.diskspace = 0 THEN -1 WHEN pane
 ]]>
 						</content>
 					</file>
-					<command><![CDATA[rc-update add pure-ftpd default]]></command>
 					<command><![CDATA[/etc/init.d/pure-ftpd restart]]></command>
 				</daemon>
 			</service>
