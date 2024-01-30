@@ -2692,7 +2692,7 @@ plugin {
 				<!-- general RSpamd commands -->
 				<general>
 					<installs index="1">
-						<install><![CDATA[emerge mail-filter/rspamd]]></install>
+						<install><![CDATA[emerge --noreplace --newuse --oneshot --jobs --verbose mail-filter/rspamd]]></install>
 					</installs>
 					<commands index="2">
 						<command><![CDATA[mkdir -p /etc/rspamd/local.d/]]></command>
@@ -2761,7 +2761,7 @@ action = "no action";
 						<command><![CDATA[postconf -e "milter_default_action = accept"]]></command>
 						<command><![CDATA[postconf -e "smtpd_milters = inet:127.0.0.1:11332"]]></command>
 						<command><![CDATA[postconf -e "non_smtpd_milters = inet:127.0.0.1:11332"]]></command>
-						<command><![CDATA[chown -R _rspamd:_rspamd /var/lib/rspamd/dkim]]></command>
+						<command><![CDATA[chown -R rspamd:rspamd /var/lib/rspamd/dkim]]></command>
 						<command><![CDATA[rc-update add rspamd default]]></command>
 						<command><![CDATA[/etc/init.d/rspamd restart]]></command>
 					</commands>

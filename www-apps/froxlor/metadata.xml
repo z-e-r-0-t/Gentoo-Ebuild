@@ -19,6 +19,7 @@
     <flag name='proftpd'>Use ProFTPD for FTP service</flag>
     <flag name='pureftpd'>Use pure-FTPd for FTP service</flag>
     <flag name='quota'>Adds support for Filesystem-Quotas</flag>
+    <flag name='rspamd'>Adds support for rspamd Antispam feature</flag>
     <flag name='ssl'>Adds SSL support</flag>
     <flag name='webalizer'>Use webalizer traffic analyzer</flag>
   </use>
