@@ -279,6 +279,10 @@ src_prepare() {
 
 	if use rspamd; then
 		patch_defaults "antispam" "activated" "1"
+	else
+		#TODO FIXME: ugly workaround until final or rc
+		sed -i "s/'antispam' => 'rspamd'/'antispam' => 'x'/g" lib/Froxlor/Install/Install/Core.php \
+			|| die "Failed to disable rspamd"
 	fi
 
 	VMAIL_UID=$(id -u vmail)
