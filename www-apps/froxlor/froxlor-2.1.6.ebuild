@@ -372,11 +372,6 @@ src_install() {
 }
 
 pkg_postinst() {
-	if use fpm && use apache2; then
-		# we need this in order to apache being able to access fpm socket
-		usermod -a -G froxlor apache
-	fi
-
 	# we need to check if this is going to be an update or a fresh install!
 	if [[ -f "${ROOT}${FROXLOR_DOCROOT}/lib/userdata.inc.php" ]] ; then
 		elog "Froxlor is already installed on this system!"
