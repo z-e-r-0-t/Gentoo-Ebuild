@@ -60,7 +60,7 @@ DEPEND="
 		apache2? (
 			www-apache/mod_fcgid
 			www-servers/apache[suexec]
-			acct-user/froxlor[min_uid_1000]
+			acct-user/froxlor[min-uid-1000]
 		)
 	)
 	fpm? (
