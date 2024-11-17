@@ -258,6 +258,7 @@ mail	IN		A	<SERVERIP>
 					<command><![CDATA[chown named:0 {{settings.system.bindconf_directory}}froxlor_bind.conf]]></command>
 					<command><![CDATA[chmod 0644 {{settings.system.bindconf_directory}}froxlor_bind.conf]]></command>
 					<command><![CDATA[sed -i.bak 's/\(listen-on\(-v6\)\?\)[[:space:]]\+{[^}]\+}/\1 { any; }/g' /etc/bind/named.conf]]></command>
+					<command><![CDATA[sed -i.bak 's/^\([[:space:]]*\)\(dnssec-enable\)/\1\/\/\2/' /etc/bind/named.conf]]></command>
 					<command><![CDATA[/etc/init.d/named restart]]></command>
 				</daemon>
 				<daemon name="powerdns" title="PowerDNS (standalone)">
