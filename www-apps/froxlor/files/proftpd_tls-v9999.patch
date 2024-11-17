@@ -1,0 +1,13 @@
+diff --git a/lib/Froxlor/Cron/Http/LetsEncrypt/AcmeSh.php b/lib/Froxlor/Cron/Http/LetsEncrypt/AcmeSh.php
+index 11ee96a3..d62a69ef 100644
+--- a/lib/Froxlor/Cron/Http/LetsEncrypt/AcmeSh.php
++++ b/lib/Froxlor/Cron/Http/LetsEncrypt/AcmeSh.php
+@@ -650,7 +650,7 @@ EOSSL;
+ 						file_put_contents($dovecot_conf, $ssl_content);
+ 					}
+ 					if (Settings::IsInList('system.le_renew_services', 'proftpd')) {
+-						$proftpd_conf = '/etc/proftpd/tls.conf'; // @fixme setting?
++						$proftpd_conf = '/etc/proftpd/proftpd.conf'; // @fixme setting?
+ 						$rval = false;
+ 						// ECC certificate or not?
+ 						if (strpos($certificate_folder, '_ecc') === false) {
