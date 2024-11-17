@@ -2706,6 +2706,7 @@ subject = "***SPAM*** %s"
 						<file name="/etc/rspamd/local.d/arc.conf"
 							  chown="root:root" chmod="0644" backup="true">
 							<content><![CDATA[
+use_esld = false;
 try_fallback = true;
 ### Enable DKIM signing for alias sender addresses
 allow_username_mismatch = true;
@@ -3060,27 +3061,7 @@ MaxLoginAttempts 3
 </IfModule>
 
 <IfModule mod_tls.c>
-  TLSEngine                               on
-  TLSLog                                  /var/log/proftpd-tls.log
-  TLSProtocol                             TLSv1.2 TLSv1.3
-  TLSRSACertificateFile                   /etc/ssl/certs/proftpd.crt
-  TLSRSACertificateKeyFile                /etc/ssl/private/proftpd.key
-  TLSECCertificateFile                    /etc/ssl/certs/proftpd_ec.crt
-  TLSECCertificateKeyFile                 /etc/ssl/private/proftpd_ec.key
-  # TLSCACertificateFile
-  TLSOptions                              NoSessionReuseRequired
-  TLSVerifyClient                         off
-
-  # Are clients required to use FTP over TLS when talking to this server?
-  TLSRequired                             on
-
-  # Allow SSL/TLS renegotiations when the client requests them, but
-  # do not force the renegotiations.  Some clients do not support
-  # SSL/TLS renegotiations; when mod_tls forces a renegotiation, these
-  # clients will close the data connection, or there will be a timeout
-  # on an idle data connection.
-  #
-  #TLSRenegotiate                          required off
+  Include /etc/proftpd/tls.conf
 </IfModule>
 
 <Class whitelist>
@@ -3122,6 +3103,35 @@ MaxLoginAttempts 3
   <IfModule !mod_ifsession.c>
     DelayEngine  on
   </IfModule>
+</IfModule>
+]]>
+						</content>
+					</file>
+					<file name="/etc/proftpd/tls.conf" chown="root:root"
+						chmod="0600" backup="true">
+						<content><![CDATA[
+<IfModule mod_tls.c>
+TLSEngine                               on
+TLSLog                                  /var/log/proftpd/tls.log
+TLSProtocol                             TLSv1.2 TLSv1.3
+TLSRSACertificateFile                   /etc/ssl/certs/proftpd.crt
+TLSRSACertificateKeyFile                /etc/ssl/private/proftpd.key
+TLSECCertificateFile                    /etc/ssl/certs/proftpd_ec.crt
+TLSECCertificateKeyFile                 /etc/ssl/private/proftpd_ec.key
+# TLSCACertificateFile
+TLSOptions                              NoSessionReuseRequired
+TLSVerifyClient                         off
+
+# Are clients required to use FTP over TLS when talking to this server?
+TLSRequired                             on
+
+# Allow SSL/TLS renegotiations when the client requests them, but
+# do not force the renegotiations.  Some clients do not support
+# SSL/TLS renegotiations; when mod_tls forces a renegotiation, these
+# clients will close the data connection, or there will be a timeout
+# on an idle data connection.
+#
+#TLSRenegotiate                          required off
 </IfModule>
 ]]>
 						</content>
