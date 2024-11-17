@@ -8,7 +8,7 @@ HOMEPAGE="https://www.froxlor.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="+apache2 awstats bind fcgid +fpm +goaccess lighttpd mailquota nginx pdns +proftpd pureftpd quota rspamd +ssl webalizer"
+IUSE="+apache2 awstats bind fcgid +fpm +goaccess lighttpd mailquota nginx pdns +proftpd pureftpd quota +rspamd +ssl webalizer"
 KEYWORDS="~amd64 ~x86"
 
 DEPEND="
