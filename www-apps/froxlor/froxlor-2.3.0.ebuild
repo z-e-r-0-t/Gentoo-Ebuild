@@ -163,7 +163,7 @@ src_prepare() {
 	patch_defaults "system" "mod_fcgid_httpgroup" "froxlor"
 
 	# set correct webserver reload
-	if use use nginx; then
+	if use nginx; then
 		einfo "Switching settings to fit 'nginx'"
 		patch_defaults "system" "apachereload_command" "$(get_restart_command nginx restart)"
 		patch_defaults "system" "webserver" "nginx"
