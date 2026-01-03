@@ -2497,29 +2497,32 @@ dovecot	  unix	-	n	n	-	-	pipe
 				<!-- Dovecot -->
 				<general>
 					<files index="1">
-						<file name="/etc/dovecot/dovecot-sql.conf.ext"
-							chown="root:root" chmod="0600" backup="true">
-							<content><![CDATA[
-driver = mysql
-connect = "host=<SQL_HOST> dbname=<SQL_DB> user=<SQL_UNPRIVILEGED_USER> password=<SQL_UNPRIVILEGED_PASSWORD>"
-user_query = SELECT CONCAT(homedir, maildir) AS home, CONCAT('maildir:', homedir, maildir) AS mail, uid, gid, CONCAT('*:storage=', quota, 'M') as quota_rule FROM mail_users WHERE (username = '%u' OR email = '%u')
-password_query = SELECT username AS user, password_enc AS password, CONCAT(homedir, maildir) AS userdb_home, uid AS userdb_uid, gid AS userdb_gid,  CONCAT('maildir:', homedir, maildir) AS userdb_mail, CONCAT('*:storage=', quota, 'M') as userdb_quota_rule FROM mail_users WHERE (username = '%u' OR email = '%u') AND ((imap = 1 AND '%Ls' = 'imap') OR (pop3 = 1 AND '%Ls' = 'pop3') OR ((postfix = 'Y' AND '%Ls' = 'smtp') OR (postfix = 'Y' AND '%Ls' = 'sieve')))
-iterate_query = "SELECT username AS user FROM mail_users WHERE (imap = 1 OR pop3 = 1)"
-]]>
-							</content>
-						</file>
 						<file name="/etc/dovecot/conf.d/99-froxlor.conf" chown="root:0"
-							chmod="0644" backup="true">
+							chmod="0640" backup="true">
 							<content><![CDATA[
-disable_plaintext_auth = no
+auth_allow_cleartext = yes
 auth_mechanisms = plain login
-!include auth-sql.conf.ext
-mail_location = mbox:~/mail:INBOX=/var/mail/%u
+
+sql_driver = mysql
+mysql <SQL_HOST> {
+  user = <SQL_UNPRIVILEGED_USER>
+  password = <SQL_UNPRIVILEGED_PASSWORD>
+  dbname = <SQL_DB>
+}
+
+passdb sql {
+  query = SELECT username AS user, password_enc AS password, CONCAT(homedir, maildir) AS userdb_home, uid AS userdb_uid, gid AS userdb_gid, "maildir" as userdb_mail_driver, CONCAT(homedir, maildir) AS userdb_mail_path, CONCAT(quota, 'M') as userdb_quota_storage_size FROM mail_users WHERE (username = '%{user}' OR email = '%{user}') AND ((imap = 1 AND '%{protocol | lower}' = 'imap') OR (pop3 = 1 AND '%{protocol | lower}' = 'pop3') OR ((postfix = 'Y' AND '%{protocol | lower}' = 'smtp') OR (postfix = 'Y' AND '%{protocol | lower}' = 'sieve')))
+}
+
+userdb sql {
+  query = SELECT CONCAT(homedir, maildir) AS home, "maildir" as mail_driver, CONCAT(homedir, maildir) AS mail_path, uid, gid, CONCAT(quota, 'M') as quota_storage_size FROM mail_users WHERE (username = '%{user}' OR email = '%{user}')
+}
 
 namespace inbox {
   inbox = yes
 }
 mail_privileged_group = mail
+mail_inbox_path = ~/
 
 service auth {
   # Postfix smtp-auth
@@ -2542,45 +2545,54 @@ service stats {
 }
 
 ssl = yes
-ssl_cert = <<SSL_CERT_FILE>
-ssl_key = <<SSL_KEY_FILE>
-ssl_dh = </etc/dovecot/dh.pem
-ssl_prefer_server_ciphers = yes
+ssl_server_cert_file = <SSL_CERT_FILE>
+ssl_server_key_file = <SSL_KEY_FILE>
+ssl_server_dh_file = /etc/dovecot/dh.pem
+ssl_server_prefer_ciphers = server
 
 postmaster_address = postmaster@<SERVERNAME>
 
 protocol imap {
-  mail_plugins = $mail_plugins quota imap_quota
+  mail_plugins {
+    imap_quota = yes
+  }
 }
 
-pop3_logout_format = in=%i out=%o top=%t/%p, retr=%r/%b, del=%d/%m, size=%s
+pop3_logout_format = "in=%{input} out=%{output} top=%{top_count}/%{top_bytes}, retr=%{retr_count}/%{retr_bytes}, del=%{deleted_count}/%{deleted_bytes}, size=%{message_bytes}"
 
-plugin {
-  sieve = file:~/sieve;active=~/.dovecot.sieve
-  sieve_dir = ~/sieve
+protocol lda {
+	mail_plugins {
+		sieve = yes
+	}
 }
 
-plugin {
-  quota = maildir:User quota
+sieve_script personal {
+  driver = file
+  path = ~/sieve
+  active_path = ~/.dovecot.sieve
 }
+
+mail_plugins {
+  quota = yes
+}
+
+last_valid_uid = {{settings.system.vmail_uid}}
 ]]>
 							</content>
 						</file>
 					</files>
 					<commands index="1">
-						<command><![CDATA[sed -i.bak 's/^!include auth-system.conf.ext/#!include auth-system.conf.ext/' /etc/dovecot/conf.d/10-auth.conf]]></command>
+						<command><![CDATA[sed -i.bak '/^passdb pam {/,/^}/ s/^#*\(.*\)/#\1/; /^ssl_server {/,/^}/ s/^#*\(.*\)/#\1/; /^[[:space:]]*lmtp = yes/ s/^#*\(.*\)/#\1/' /etc/dovecot/dovecot.conf]]></command>
+						<command><![CDATA[sed -i.bak 's/^[#[:blank:]]*first_valid_uid[[:blank:]]*=.*$/first_valid_uid = {{settings.system.vmail_uid}}/' /etc/dovecot/dovecot.conf]]></command>
 						<command><![CDATA[/etc/init.d/dovecot restart]]></command>
 					</commands>
 				</general>
 				<daemon name="dovecot_postfix" version="2" title="Dovecot"
 					default="true">
-					<install><![CDATA[USE="argon2 mysql" emerge --noreplace --newuse --oneshot --jobs --verbose net-mail/dovecot]]></install>
+					<install><![CDATA[USE="argon2 mysql sieve" emerge --noreplace --newuse --oneshot --jobs --verbose net-mail/dovecot]]></install>
 					<include>//service[@type='mail']/general/files[@index=1]
 					</include>
 					<command><![CDATA[if [ ! -f /etc/dovecot/dh.pem ]; then openssl dhparam -out /etc/dovecot/dh.pem 3072; fi]]></command>
-					<!-- Restrict access to vmail user (vmail uid may be lower than default value 500 -> set it here) -->
-					<command><![CDATA[sed -i.bak 's/^[#[:blank:]]*first_valid_uid[[:blank:]]*=.*$/first_valid_uid = {{settings.system.vmail_uid}}/' /etc/dovecot/conf.d/10-mail.conf]]></command>
-					<command><![CDATA[sed -i.bak 's/^[#[:blank:]]*last_valid_uid[[:blank:]]*=.*$/last_valid_uid = {{settings.system.vmail_uid}}/' /etc/dovecot/conf.d/10-mail.conf]]></command>
 					<include>//service[@type='mail']/general/commands[@index=1]
 					</include>
 				</daemon>

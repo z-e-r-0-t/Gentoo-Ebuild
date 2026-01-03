@@ -19,8 +19,7 @@ DEPEND="
 	app-admin/logrotate
 	app-crypt/gnupg
 	>=dev-lang/php-7.4:*[bcmath,cli,ctype,curl,filter,gd,gmp,mysql,pdo,posix,session,xml,zip]
-	>=net-mail/dovecot-2.2.0[argon2,mysql]
-	<=net-mail/dovecot-2.3.9999[argon2,mysql]
+	>=net-mail/dovecot-2.4.0[argon2,mysql,sieve]
 	>=mail-mta/postfix-3.8[dovecot-sasl,mysql,ssl=]
 	>=sys-auth/libnss-extrausers-0.6
 	sys-process/cronie
